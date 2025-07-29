@@ -1,0 +1,51 @@
+{% extends "index.html" %}
+
+{% block jsonld %}
+{{ jsonld_macros::breadcrumb(path=["/tags", term.path], titles=["Tags", term.name]) }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": [
+        {%- for page in paginator.pages %}
+        {
+            "@type": "ListItem",
+            "position": {{ loop.index }},
+            "item": {
+                "@id": "{{ page.permalink | safe }}",
+                "name": "{{ page.title }}",
+                "url": "{{ page.permalink | safe }}"
+            }
+        }{% if not loop.last %},{% endif %}
+        {%- endfor %}
+    ],
+    "itemListOrder": "https://schema.org/ItemListOrderDescending",
+    "name": "Tag: {{ term.name }}"
+}
+</script>
+{% endblock jsonld %}
+
+{% block content %}
+    <div class="posts">
+        <h2>Tag: {{ term.name }}</h2>
+        <br>
+        {% for page in paginator.pages %}
+            {% if not page.extra.retired %}
+            <article class="post-entry">
+                {{ post_macros::page_in_list(page=page)}}
+            </article>
+            {% endif %}
+        {% endfor %}
+        <footer class="page-footer">
+            <nav class="pagination">
+                {% if paginator.previous %}
+                    <a class="prev" href="{{ paginator.previous }}">← Previous</a>
+                {% endif %}
+                <!-- <span>Page {{ paginator.current_index }} of {{ paginator.number_pagers }}</span> -->
+                {% if paginator.next %}
+                    <a class="next" href="{{ paginator.next }}">Next →</a>
+                {% endif %}
+            </nav>
+        </footer>
+    </div>
+{% endblock content %}

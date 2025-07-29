@@ -1,0 +1,9 @@
+{% extends "index.html" %}
+
+{%- block jsonld %}
+{{ jsonld_macros::breadcrumb(path=["/404"], titles=["404"]) }}
+{% endblock jsonld -%}
+
+{% block body %}
+<div class="not-found">404</div>
+{% endblock body %}

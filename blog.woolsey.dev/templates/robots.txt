@@ -1,0 +1,6 @@
+User-agent: *
+Disallow:
+Allow: /
+User-agent: Googlebot-Image
+Disallow: /processed_images
+Sitemap: {{ get_url(path="sitemap.xml") }}

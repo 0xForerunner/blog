@@ -1,0 +1,23 @@
+name: Publish to GitHub Pages
+
+permissions:
+    contents: none
+
+on:
+    push:
+        branches:
+            - master
+
+jobs:
+    publish:
+        runs-on: ubuntu-latest
+        steps:
+            - name: checkout
+              uses: actions/checkout@v4
+            - name: build_and_deploy
+              uses: shalzz/zola-deploy-action@master
+              env:
+                  REPOSITORY: 0xForerunner/0xForerunner.github.io
+                  PAGES_BRANCH: master
+                  BUILD_DIR: ./blog.woolsey.dev
+                  TOKEN: ${{ secrets.PUBLIC_TOKEN }}
