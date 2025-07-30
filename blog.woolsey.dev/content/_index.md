@@ -22,7 +22,7 @@
 # About the Author
 
 
-I am a Senior Software Engineer, Rust enthusiast, and open source advocate with an extremely diverse background (including a Ph.D. in Physics that I occasionally bring up to sound fancy). I love building things from scratch and diving into new technologies head-first. From crafting low-level systems in Rust to writing smart contracts that secure digital economies, I enjoy tackling complex problems and learning as I go.
+I am a Senior Software Engineer, Rust enthusiast, and open source advocate with an extremely diverse background. I love building things from scratch and diving into new technologies head-first. From crafting low-level systems in Rust to writing smart contracts that secure digital economies, I enjoy tackling complex problems and learning as I go.
 
 In my free time, you’re more likely to find me outdoors than indoors. I live near the mountains in beautiful British Columbia, and I take full advantage of it – whether it’s snowboarding down a steep slope, kiteboarding across the water, mountain biking on forest trails, or literally running off a cliff with a paraglider. (It’s okay, there’s a parachute!) These adrenaline-fueled hobbies help balance out the sedentary life of a coder.
 
