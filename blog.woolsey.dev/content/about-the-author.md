@@ -21,6 +21,5 @@ About the Author
 I'm an avid software engineer with a background in physics. I'm usually focussed on on some random electronics project or something that's really
 captured my imagination at work. Generally everything I do is in rust if it's at all practical.
 
-After a lot of hours contributing to phpMyAdmin I received an unexpected invitation to join the team.
-That day was on the 27/08/2018, a very happy day !
-Since then I am a [Senior Rust Engineer at World](https://world.org).
+I am a [Senior Rust Engineer at World](https://world.org) where I get to build lot's of cool tech, from custom block builders that supply a chain supporting millions of users,
+to ZK circuits that allow privacy preserving proofs.
