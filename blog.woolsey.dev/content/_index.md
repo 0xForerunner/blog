@@ -41,21 +41,21 @@ I also enjoy mentoring and helping new developers find their footing. Having tra
 
 ##### Smart Contracts & Blockchain
 
-- Ethereum development: Built and maintained audited smart contracts in Solidity that have been deployed across Ethereum mainnet and layer-2 networks like Base and Optimism, as well as Worldcoin’s own blockchain. I’ve developed entire multi-contract protocols and the tooling to deploy and manage them seamlessly.
-- Deployment tooling: Created advanced developer tools to automate contract deployment, configuration, and upgrades. (Think one-click deployment for complex protocols – because manual deploys are so 2020.)
+- **Ethereum development:** Built and maintained audited smart contracts in Solidity that have been deployed across Ethereum mainnet and layer-2 networks like Base and Optimism, as well as Worldcoin’s own blockchain. I’ve developed entire multi-contract protocols and the tooling to deploy and manage them seamlessly.
+- **Deployment tooling:** Created advanced developer tools to automate contract deployment, configuration, and upgrades. (Think one-click deployment for complex protocols – because manual deploys are so 2020.)
 
 ##### Zero-Knowledge Magic
 
-- **ZK circuits:** Designed and implemented novel zero-knowledge proof circuits used in production by millions of Worldcoin users. Utilizing frameworks like Gnark, Circom, and Plonky3, I help create systems where users can prove things about their data without revealing the data itself. It’s as close to magic as coding gets, and it’s incredibly rewarding when it works.
+- **ZK circuits:** Designed and implemented novel zero-knowledge proof circuits. Utilizing frameworks like Noir, Gnark, Circom, and Plonky3, I help create systems where users can prove things about their data without revealing the data itself. It’s as close to magic as coding gets, and it’s incredibly rewarding when it works.
 - **Privacy & scalability:** Worked on integrating these ZK circuits into the Worldcoin protocol to enhance privacy and scalability. I often serve as the “bridge” between hardcore cryptography and practical product engineering – making sure all that fancy math translates into something that runs efficiently on-chain.
 
 ##### Infrastructure & Performance
 
-- **Protocol infrastructure:** Developed fundamental backend services critical to Worldcoin’s operation. For example, I built a custom blockchain block builder based on Reth (a Rust Ethereum client) to optimize how transactions are assembled, with compatibility for Flashbots and Rollup-Boost (MEV strategies). In plain terms: I work on the engine that helps our blockchain run smoother and faster.
-- **Cloud deployment:** Manage our Kubernetes clusters and cloud infrastructure on AWS, ensuring services are scalable, monitored, and resilient. If a server crashes at 3 AM, the system’s fail-safes kick in so (with any luck) I can keep sleeping soundly through the night.
+- **Protocol infrastructure:** Developed fundamental backend services critical to Worldcoin’s operation including a custom blockchain block builder based on Reth. In plain terms: I work on the engine that helps our blockchain run smoother and faster.
+- **Cloud deployment:** Manage our Kubernetes clusters and cloud infrastructure on AWS, ensuring services are scalable, monitored, and resilient.
 
 ##### Mentorship & Teamwork
-- **Developer mentoring:** At Tools for Humanity, I’ve mentored new hires and interns, especially those new to Rust or crypto. Onboarding someone into a complex codebase (and often a new programming language) can be daunting, so I take pride in being a patient guide. I’ve run training sessions, given countless code walkthroughs, and yes – I’m the guy who actually enjoys writing documentation for others.
+- **Developer mentoring:**  Onboarding someone into a complex codebase (and often a new programming language) can be daunting, so I take pride in being a thorough guide. I’ve run training sessions, given countless code walkthroughs, and yes – I’m the guy who actually enjoys writing documentation for others.
 - **Team culture:** As part of the core team, I advocate for thorough code reviews, knowledge sharing, and a blameless culture. Building cutting-edge tech is a team sport – I contribute wherever I can, whether it’s reviewing a tricky PR or brainstorming how to shave milliseconds off a cryptographic algorithm.
 
 ### Senior Software Engineer at Cryptech Developments – _principle engineer for the Neptune Protocol_
@@ -64,8 +64,8 @@ I also enjoy mentoring and helping new developers find their footing. Having tra
 
 ##### Smart Contracts & DeFi
 
-- **DeFi protocol development:** Designed and implemented a complex multi-contract lending protocol called Neptune from the ground up. I wrote the smart contracts in Rust (using CosmWasm for the Cosmos blockchain ecosystem) with a strong emphasis on safety (to protect those precious crypto assets), scalability, and efficiency.
-- **Full-stack blockchain dev:** As the lead (and often only) developer on Neptune, I wasn’t just writing contract code – I handled everything from core business logic to optimizing gas costs and shepherding the code through security audits. Basically, I wore all the hats at once and somehow kept my head on.
+- **DeFi protocol development:** Designed and implemented a complex multi-contract lending protocol called Neptune from the ground up. I wrote the smart contracts in Rust (using CosmWasm for the Cosmos blockchain ecosystem) with a strong emphasis on safety, scalability, and efficiency.
+- **Full-stack blockchain dev:** As the lead developer on Neptune, I wasn’t just writing contract code – I handled everything from core business logic to optimizing gas costs and shepherding the code through security audits. Basically, I wore all the hats at once and somehow kept my head on.
 
 ##### Backend & Automation
 
@@ -75,13 +75,13 @@ I also enjoy mentoring and helping new developers find their footing. Having tra
 ##### Simulation & Testing
 
 - **Monte Carlo simulations:** Leveraged my simulation expertise to build Monte Carlo models predicting market behavior under various conditions. This helped us tune parameters (like collateralization ratios) and prepare for extreme scenarios. I basically built a mini “what-if” machine for our economy.
-- **Thorough testing:** Implemented a comprehensive testing strategy – from unit tests to integration tests – to ensure Neptune’s smart contracts and services behaved correctly. I set up continuous integration pipelines so that every new code change was greeted with a gauntlet of tests. (There’s no better feeling than seeing 100% test coverage… okay, maybe landing a difficult kiteboard trick comes close.)
+- **Thorough testing:** Implemented a comprehensive testing strategy – from unit tests to integration tests – to ensure Neptune’s smart contracts and services behaved correctly. I set up continuous integration pipelines so that every new code change was greeted with a gauntlet of tests.
 
 ### Academic Research in Physics - _University of British Columbia & University of Alberta_
 
 > 2011 - 2021
 
-- During my time in academia (from undergrad through my Ph.D.), I worked on cutting-edge experiments in neutrino and dark matter physics. I designed and prototyped novel particle detectors (including a cryogenic liquid xenon detector surrounded by silicon photomultipliers), built custom electronics for experimental setups (ever made an LED pulsing circuit with picosecond timing? I have), and wrote countless simulations to analyze subatomic events (GEANT4 was basically my sidekick). It was a challenging and wild journey that sharpened my problem-solving skills and taught me how to improvise with both hardware and software.
+- During my time in academia (from undergrad through my Ph.D.), I worked on cutting-edge experiments in neutrino and dark matter physics. I designed and prototyped novel particle detectors (including a cryogenic liquid argon detector surrounded by silicon photomultipliers), built custom electronics for experimental setups (ever made an LED pulsing circuit with picosecond timing?), and wrote countless simulations to analyze subatomic events (GEANT4 was basically my sidekick). It was a challenging and wild journey that sharpened my problem-solving skills and taught me how to improvise with both hardware and software.
 - **Why it matters:** This research background might seem far removed from software engineering, but it gave me a solid foundation in programming, data analysis, and designing complex systems. After you’ve debugged a sensor array at -110°C in an underground lab at 3:00 am, debugging a distributed cloud service in a comfy chair doesn’t seem so intimidating!
 
 ---
