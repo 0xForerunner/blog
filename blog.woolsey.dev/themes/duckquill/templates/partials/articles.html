@@ -28,7 +28,11 @@
 			{%- set blurnail = resize_image(path=page.colocated_path ~ page.extra.banner, width=4, height=2, op="fill", format="webp") -%}
 		{%- endif -%}
 		<article {% if article_type %}class="{{ article_type }}"{% endif %} {% if blurnail %}style="--blurnail: url('{{ blurnail.url }}')"{% endif %}>
-			<a href="{{ page.permalink | safe }}"></a>
+			{%- if page.extra.external_url and page.extra.external_url is matching('https?://') -%}
+    			<a href="{{ page.extra.external_url }}" rel="noopener noreferrer" class="external"></a>
+			{%- else -%}
+    			<a href="{{ page.permalink | safe }}"></a>
+			{%- endif -%}
 			{% if article_type %}
 				<span class="badge">
 					<i class="icon"></i>
