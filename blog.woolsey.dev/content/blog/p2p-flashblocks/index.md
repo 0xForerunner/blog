@@ -7,6 +7,7 @@ date = 2024-07-29
 tags = ["Rollup Boost", "OP Stack", "World", "Flashbots"]
 [extra]
 toc = true
+hot = true
 [extra.comments]
 id = ""
 +++
