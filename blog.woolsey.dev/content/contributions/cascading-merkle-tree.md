@@ -6,7 +6,7 @@ tags = ["World", "Data Structures", "Zero Knowledge Proofs"]
 
 [extra]
 external_url = "https://github.com/worldcoin/semaphore-rs/pull/70"
-# featured = true
+featured = true
 +++
 
 desc doesn't show

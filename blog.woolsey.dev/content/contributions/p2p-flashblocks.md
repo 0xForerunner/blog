@@ -6,8 +6,7 @@ tags = ["Rollup Boost", "OP Stack", "World", "Flashbots"]
 
 [extra]
 external_url = "https://github.com/flashbots/rollup-boost/pull/373"
-# hot = true
-# featured = true
+hot = true
 +++
 
 desc doesn't show
