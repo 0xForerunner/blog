@@ -165,10 +165,10 @@ show_qr = true
 
 # GoatCounter analytics; enabled only if present in config.
 [extra.goatcounter]
+
 # Your GoatCounter server; goatcounter.com is used by default.
-#
-# host = "YOUR_SERVER"
-#
+host = "goatcounter.com"
+
 # Your GoatCounter username
 user = "0xforerunner"
 
