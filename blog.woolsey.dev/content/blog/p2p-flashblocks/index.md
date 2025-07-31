@@ -8,7 +8,7 @@ date = 2025-07-29
 tags = ["Rollup Boost", "OP Stack", "World", "Flashbots"]
 
 [extra]
-banner = "banner.jpeg"
+# banner = "banner.jpeg"
 toc = true
 hot = true
 

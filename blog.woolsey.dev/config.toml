@@ -76,6 +76,8 @@ links = [
 # Put all your custom variables here
 links = []
 
+default_card_image = "card.png"
+
 # Which theme should be used by default (light/dark).
 #
 default_theme = "light"
