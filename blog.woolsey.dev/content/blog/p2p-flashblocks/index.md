@@ -2,14 +2,20 @@
 authors = ["Eric Woolsey"]
 title = "P2P Flashblocks Propagation"
 description = "Web3 native solution for preconf distribution in the OP Stack"
-date = 2024-07-29
+date = 2025-07-29
+
 [taxonomies]
 tags = ["Rollup Boost", "OP Stack", "World", "Flashbots"]
+
 [extra]
+banner = "banner.jpeg"
 toc = true
 hot = true
+
 [extra.comments]
-id = ""
+host = "mastodon.social"
+user = "0xforerunner"
+id = "114948839639110660"
 +++
 
 > **📚 Source Code**: This article discusses the implementation details of [Rollup-Boost PR #373](https://github.com/flashbots/rollup-boost/pull/373). Check out the link for the latest code and documentation.

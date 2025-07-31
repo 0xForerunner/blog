@@ -10,14 +10,14 @@ compile_sass = true
 # Whether to build a search index to be used later on by a JavaScript library
 build_search_index = false
 
-
 generate_feeds = true
-# feed_filenames = ["atom.xml"]
 feed_filenames = ["rss.xml", "atom.xml"]
 
 taxonomies = [
     { name = "tags", feed = true, paginate_by = 5 },
-    { name = "phpMyAdmin", feed = true, paginate_by = 5 },
+    { name = "Rollup Boost", feed = true, paginate_by = 5 },
+    { name = "World", feed = true, paginate_by = 5 },
+    { name = "Flashbots", feed = true, paginate_by = 5 },
 ]
 
 minify_html = true
@@ -155,9 +155,9 @@ show_source = false
 # the needed rel="me" link is set in the head based on these.
 [extra.comments]
 # Your Mastodon API host; instance that you have an account on.
-host = "vmst.io"
+host = "mastodon.social"
 # Your Mastodon username; used to determine who the original poster is.
-user = "daudix"
+user = "0xforerunner"
 # Whether to show the QR code to Mastodon post
 show_qr = true
 
@@ -168,7 +168,7 @@ show_qr = true
 # host = "YOUR_SERVER"
 #
 # Your GoatCounter username
-user = "duckquill"
+user = "0xforerunner"
 
 [extra.debug]
 # Display outlines around all elements for debugging purposes
