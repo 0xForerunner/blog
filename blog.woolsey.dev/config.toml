@@ -94,9 +94,9 @@ accent_color_dark = "#ffa348"
 emoji_favicon = "🦀"
 #
 # URL to website's issue tracker
-issues_url = "https://github.com/0xForerunner/0xForerunner.github.io/issues"
+issues_url = "https://github.com/0xForerunner/blog/issues"
 # URL to website's source code
-source_url = "https://github.com/0xForerunner/0xForerunner.github.io"
+source_url = "https://github.com/0xForerunner/blog"
 #
 # Whether to show "copy code" button on all code blocks
 # that have the language set.
