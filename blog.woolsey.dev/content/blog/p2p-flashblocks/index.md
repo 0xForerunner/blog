@@ -101,7 +101,7 @@ pub enum AuthorizedMsg {
 
 - **StopPublish:** This is the counterpart signal: “I’m stopping (or finished) my block building.” It indicates the peer is stepping down as an active builder. In practice, a StopPublish is only sent in response to receiving a `StartPublish` message.
 
-These messages allow a kind of leader election or failover coordination. Let’s parse how we them:
+These messages allow a kind of leader election or failover coordination. Let’s parse how we handle them:
 
 #### StartPublish: Yielding to a New Builder
 
@@ -109,7 +109,7 @@ If our node is *not currently building a block*, receiving a `StartPublish` from
 
 If our node *is currently building* when a StartPublish comes in from someone else, that’s a potential conflict. The code’s strategy here is somewhat selfless (and pragmatic): we **stop our own publishing** to avoid a tug-of-war. Upon seeing a peer’s StartPublish while we are in `Publishing` status, we create a `StopPublish` message *signed by us and using our most recent authorization*. This is our white flag: *“Okay, you be the builder. I’m stepping down.”* Our status switches to `NotPublishing`, and we list the other peer as active publishers.
 
-If our node was in a weird intermediate state – say we were *about to* publish (in a waiting state, maybe we intended to start at the next block but hadn’t yet because someone else was active last block) – and we get a StartPublish from another peer, we choose to **ignore** the request in terms of overriding anything. This is basically *“We’re already in line to publish, and someone else is also signaling to publish – let’s not thrash, we’ll stick to our plan and let the surrounding RAFT consensus (at the next block boundary) sort it out.”* In practice, simultaneous `StartPublish` signals might happen in a double failover scenario (two nodes racing to replace a failed builder). We acknowledges this race could happen (“double failover” scenario) but chooses not to immediately resolve it, instead relying on the underlying RAFT consensus algoritm which selects the sequencer leader (and thus flashblocks publisher) to eventually regain consistancy.
+If our node was in a weird intermediate state – say we were *about to* publish (in a waiting state, maybe we intended to start at the next block but hadn’t yet because someone else was active last block) – and we get a StartPublish from another peer, we choose to **ignore** the request in terms of overriding anything. This is basically *“We’re already in line to publish, and someone else is also signaling to publish – let’s not thrash, we’ll stick to our plan and let the surrounding RAFT consensus (at the next block boundary) sort it out.”* In practice, simultaneous `StartPublish` signals might happen in a double failover scenario (two nodes racing to replace a failed builder). We acknowledge that this race could happen (“double failover” scenario) but choose not to immediately resolve it. Instead we rely on the underlying RAFT consensus algoritm which selects the sequencer leader (and thus flashblocks publisher) to eventually regain consistancy.
 
 #### StopPublish: Stepping Aside Gracefully
 
