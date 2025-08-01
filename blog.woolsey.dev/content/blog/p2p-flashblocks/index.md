@@ -33,7 +33,7 @@ Flashblocks were introduced as an extension of Flashbots' Rollup-Boost, aiming t
 - **Higher Throughput:** By overlapping execution and networking (and amortizing the expensive state root computation over several chunks), Flashblocks can squeeze in [more gas per second overall](https://writings.flashbots.net/introducing-rollup-boost#:~:text=2,wallet%20and%20front%20end%20integration).
 - **Same Trust Model:** All this is done while still running an explicit auction (think MEV bidding) each flashblock interval, and using Trusted Execution Environments (TEEs) to ensure the sequencer behaves. In other words, even though blocks are streaming, the fairness and verifiability are preserved by cryptographic attestation in the TEE.
 
-To visualize, imagine the block builder as an assembly line that doesn’t stop: transactions flow into the TEE-protected builder, which orders and executes them in **200ms batches**, spitting out partial block segments one after another. These segments (flashblocks) are then shipped off to rpc providers continuously, rather than as. The final block (every 2s or so) is essentially the combination of the last few flashblocks, but by then everyone’s already seen the pieces.
+To visualize, imagine the block builder as an assembly line that doesn’t stop: transactions flow into the TEE-protected builder, which orders and executes them in **200ms batches**, spitting out partial block segments one after another. These segments (flashblocks) are then shipped off to rpc providers continuously. The final block (every 2s or so) is essentially the combination of the last few flashblocks, but by then everyone’s already seen the pieces.
 
 Now that we’re clear on what Flashblocks achieve, let’s talk about the special sauce that enables all this speed in a distributed setting: the Flashblocks **P2P network**. High-speed block streaming could easily devolve into chaos (imagine *multiple chefs* rapidly throwing ingredients into a soup). The P2P mechanism is the coordination layer ensuring all participants know who the *head chef* is at any moment and that every partial block arrives intact, in order, and verified.
 
@@ -41,17 +41,37 @@ Now that we’re clear on what Flashblocks achieve, let’s talk about the speci
 
 Flashblocks P2P is essentially a club of peers (block builders and flashblock consumers) engaged in rapid-fire gossip of partial blocks. Unlike a typical P2P network that floods transactions from *any* node, this is a more tight-knit protocol where only authorized block-building nodes can generate new messages. The goals of the Flashblocks P2P layer are straightforward yet ambitious: **propagate partial blocks in ~real-time, coordinate which node is currently building, and do it all without tripping over each other**. Let’s break down how it works, piece by piece (or should we say, flashblock by flashblock).
 
+<!-- ![architecture](architecture.png) -->
+{{ image(url="architecture.png", alt="Flashblocks P2P Network Architecture", width=15, height=15, op="fit") }}
+
 ### Signed, Sealed, Delivered: Authorized Messages
 
-First, every message flying around in this P2P network is **signed and authorized**. When a builder node creates a new flashblock or a coordination signal, it wraps it in an **`Authorized`** envelope that includes a cryptographic signature involving both the authorizer's (rollup-boost) and builder's key pairs, a timestamp, and the paylad id. This ensures a few things:
+First, every message flying around in this P2P network is **signed and authorized**. When a builder node creates a new flashblock or a coordination signal, it wraps it in an **`Authorized`** envelope that includes a cryptographic signature involving both the authorizer's (rollup-boost) and builder's signature, a timestamp, and the paylad id.
 
-- **Authenticity:** Only known and authorized builders (with valid keypairs) can produce messages. If some rogue tries to inject a fake partial block, the other peers will drop it because the signature won’t verify against an authorized builder’s public key.
+```rust
+pub struct Authorization {
+    pub payload_id: PayloadId,
+    pub timestamp: u64,
+    pub builder_vk: VerifyingKey,
+    pub authorizer_sig: Signature,
+}
+
+pub struct Authorized {
+    pub msg: AuthorizedMsg,
+    pub authorization: Authorization,
+    pub actor_sig: Signature,
+}
+```
+
+This ensures a few things:
+
+- **Authenticity:** Only known and authorized builders can produce messages. If some rogue tries to inject a fake partial block, the other peers will drop it because the signature won’t verify against an authorized builder’s public key.
 - **Integrity:** The content (whether it’s a piece of block or a control message) can’t be tampered with in transit. If it is, signature verification fails.
-- **Freshness:** The timestamp (and some consensus context like a payload ID) is used to prevent replay attacks or using old data. If an old message from a past block turns up, peers will recognize it’s stale and ignore it.
+- **Freshness:** The timestamp and payload ID is used to prevent replay attacks or using old data. If an old message from a past block turns up, peers will recognize it’s stale and ignore it.
 
-When a message arrives, the receiving peer runs it through `FlashblocksP2PMsg::decode` and then `authorized.verify(...)` using a known **authorizer verifying key** (a network-wide verifier) to confirm the signature is legit. Only then will it process the message. If verification fails – maybe the message is bogus or the peer is trying something fishy – it doesn’t just get ignored; the peer’s reputation is dinged (the protocol has a reputation system to penalize misbehavior). Essentially, the network is saying *“bad peer, no cookies for you”* and if a peer misbehaves too much, it could be dropped.
+When a message arrives, the receiving peer decodes it and calls `Authorized::verify(...)` using a known **authorizer verifying key** (a network-wide verifier) to confirm the signature is legit. Only then will it process the message. If verification fails – maybe the message is bogus or the peer is trying something fishy – it doesn’t just get ignored; the peer’s reputation is dinged (the protocol has a reputation system to penalize misbehavior). Essentially, the network is saying *“bad peer, no cookies for you”* and if a peer misbehaves too much, it could be dropped.
 
-One quirky check in the code: a node compares the incoming message’s builder ID with its **own** builder key. Why? To detect the scenario where it might be hearing its *own* message echoed back by a peer. If a node sees its own signature coming from someone else, it logs a warning like “received our own message from peer” – an indication that the peer is regurgitating data it got from us. That peer gets flagged for a bad message. This prevents feedback loops and the network equivalent of talking to yourself in a cave of echoes.
+One quirky check: a node compares the incoming message’s builder ID with its **own** builder key. Why? To detect the scenario where it might be hearing its *own* message echoed back by a peer. If a node sees its own signature coming from someone else, it logs a warning like “received our own message from peer” – an indication that the peer is regurgitating data it got from us. That peer gets flagged for a bad message. This prevents feedback loops and the network equivalent of talking to yourself in a cave of echoes.
 
 ### Flashblocks Payload Broadcast: Sharing the Goods
 
@@ -63,19 +83,25 @@ This logic ensures that each partial block is broadcast *exactly once per peer*,
 
 #### Duplicate Detection and Spam Control
 
-In such a high-frequency environment, it’s crucial to be vigilant about duplicates – intentional or not. Each connection keeps a `received` bitmap (or vector) indexed by flashblock number, to mark which chunk indices from the current block it has gotten from that peer. If a peer tries to send the same chunk twice (say, chunk #1 of the current block, again), the code considers this a mild offense (reputation tagged as *AlreadySeenTransaction*, indicating spammy or redundant behavior). One duplicate won’t get you kicked out, but it’s definitely noted – this prevents a peer from flooding us with repeated data to try and slow us down.
+In such a high-frequency environment, it’s crucial to be vigilant about duplicates – intentional or not. Each connection keeps a `received` bitmap (or vector) indexed by flashblock number, to mark which chunk indices from the current block it has gotten from that peer. If a peer tries to send the same chunk twice (say, chunk #1 of the current block, again), we considers this a mild offense (reputation tagged as *AlreadySeenTransaction*, indicating spammy or redundant behavior). One duplicate won’t get you kicked out, but it’s definitely noted – this prevents a peer from flooding us with repeated data to try and slow us down.
 
-Importantly, when a new block starts (detected by a more recent timestamp), the connection resets its `received` vector for that peer. Fresh block, fresh slate. That way, chunk indices start over from 0 for the new block and we don’t mistakenly think a “chunk #0” of a new block is a duplicate of the last block’s chunk #0. This **payload tracking** is how the protocol keeps multiple streams of partial blocks (for different blocks) from interleaving or confusing each other.
+### Who’s cooking? Coordinating with Start/Stop Signals
 
-### Who’s the Builder? Coordinating with Start/Stop Signals
+One of the trickiest parts of Flashblocks P2P is coordinating *who* is currently publishing flashblocks at any given time, specifically when there are multiple block builders (HA Sequencer setups). You can imagine that normally there’s one active builder creating the flashblocks, but what if that node goes down and another needs to take over? We need a way for nodes to politely agree on who’s in charge of block production. Enter the **Control Messages** – these are the signals used to negotiate the role of “active publisher” among peers.
 
-One of the trickiest parts of Flashblocks P2P is coordinating *who* is currently building the block at any given time, especially in a scenario where there might be multiple potential builders (for fault tolerance or decentralization). You can imagine that normally there’s one active builder (say, a TEE node) creating the flashblocks, but what if that node goes down and another needs to take over? We need a way for nodes to politely agree on who’s in charge of block production. Enter the **`StartPublish`** and **`StopPublish`** messages – these are the signals used to negotiate the role of “active publisher” among peers.
+```rust
+pub enum AuthorizedMsg {
+    FlashblocksPayloadV1(FlashblocksPayloadV1) = 0x00,
+    StartPublish(StartPublish) = 0x01,
+    StopPublish(StopPublish) = 0x02,
+}
+```
 
 - **StartPublish:** Picture a peer waving a flag and shouting “I’m going to start building the next block now!” A node sends an `Authorized(StartPublish)` message to indicate it intends to become the block producer for the upcoming block (or current one, if a failover is happening). This message, like the flashblocks, is signed and timestamped (so you can’t maliciously replay an old “I will build” from last year and confuse everyone). When others receive a valid StartPublish, they update their records of **active publishers**.
 
-- **StopPublish:** This is the counterpart signal: “I’m stopping (or finished) my block building.” It indicates the peer is stepping down as an active builder. In practice, a StopPublish is only sent in response to receiving a StartPublish message.
+- **StopPublish:** This is the counterpart signal: “I’m stopping (or finished) my block building.” It indicates the peer is stepping down as an active builder. In practice, a StopPublish is only sent in response to receiving a `StartPublish` message.
 
-These messages allow a kind of leader election or failover coordination. Let’s parse how the code handles them:
+These messages allow a kind of leader election or failover coordination. Let’s parse how we them:
 
 #### StartPublish: Yielding to a New Builder
 
@@ -83,7 +109,7 @@ If our node is *not currently building a block*, receiving a `StartPublish` from
 
 If our node *is currently building* when a StartPublish comes in from someone else, that’s a potential conflict. The code’s strategy here is somewhat selfless (and pragmatic): we **stop our own publishing** to avoid a tug-of-war. Upon seeing a peer’s StartPublish while we are in `Publishing` status, we create a `StopPublish` message *signed by us and using our most recent authorization*. This is our white flag: *“Okay, you be the builder. I’m stepping down.”* Our status switches to `NotPublishing`, and we list the other peer as active publishers.
 
-If our node was in a weird intermediate state – say we were *about to* publish (in a waiting state, maybe we intended to start at the next block but hadn’t yet because someone else was active last block) – and we get a StartPublish from another peer, the code chooses to **ignore** the request in terms of overriding anything. It logs a warning like “StartPublish over p2p while already waiting to publish, ignoring.” This is basically *“We’re already in line to publish, and someone else is also signaling to publish – let’s not thrash, we’ll stick to our plan and let the consensus (next block boundary) sort it out.”* In practice, simultaneous StartPublish signals might happen in a double failover scenario (two nodes racing to replace a failed builder). The code acknowledges this race could happen (“double failover” scenario) but chooses not to immediately resolve it, instead relying on the underlying RAFT consensus algoritm which selects the sequencer leader (and thus flashblocks publisher) to eventually regain consistancy.
+If our node was in a weird intermediate state – say we were *about to* publish (in a waiting state, maybe we intended to start at the next block but hadn’t yet because someone else was active last block) – and we get a StartPublish from another peer, we choose to **ignore** the request in terms of overriding anything. This is basically *“We’re already in line to publish, and someone else is also signaling to publish – let’s not thrash, we’ll stick to our plan and let the surrounding RAFT consensus (at the next block boundary) sort it out.”* In practice, simultaneous `StartPublish` signals might happen in a double failover scenario (two nodes racing to replace a failed builder). We acknowledges this race could happen (“double failover” scenario) but chooses not to immediately resolve it, instead relying on the underlying RAFT consensus algoritm which selects the sequencer leader (and thus flashblocks publisher) to eventually regain consistancy.
 
 #### StopPublish: Stepping Aside Gracefully
 
