@@ -4,7 +4,7 @@ description = "A novel way to contruct a dense, multithreaded, and growable fixe
 date = 2024-04-12
 
 [taxonomies]
-tags = ["World", "Data Structures", "Zero Knowledge Proofs"]
+tags = ["World", "Data Structures", "Zero Knowledge Proofs", "Rust"]
 
 [extra]
 external_url = "https://github.com/worldcoin/semaphore-rs/pull/70"

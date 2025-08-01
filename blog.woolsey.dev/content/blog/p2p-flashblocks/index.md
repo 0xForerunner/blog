@@ -5,7 +5,7 @@ description = "Web3 native solution for preconf distribution in the OP Stack"
 date = 2025-07-29
 
 [taxonomies]
-tags = ["Rollup Boost", "OP Stack", "World", "Flashbots"]
+tags = ["Rollup Boost", "OP Stack", "World", "Flashbots", "Rust"]
 
 [extra]
 # banner = "banner.jpeg"
