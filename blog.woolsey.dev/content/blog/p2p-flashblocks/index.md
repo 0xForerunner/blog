@@ -10,7 +10,6 @@ tags = ["Rollup Boost", "OP Stack", "World", "Flashbots"]
 [extra]
 # banner = "banner.jpeg"
 card = "card.jpeg"
-toc = true
 hot = true
 
 [extra.comments]
