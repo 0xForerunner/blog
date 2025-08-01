@@ -67,7 +67,7 @@ show_repo = true
 links = [
     # {url = "https://codeberg.org/daudix/duckquill", name = "Repo"},
     #  {url = "$BASE_URL/demo", name = "Demo"},
-    { url = "@/blog/_index.md", name = "Blog" },
+    # { url = "@/blog/_index.md", name = "Blog" },
     { url = "@/contributions/_index.md", name = "Contributions" },
     { url = "https://github.com/0xForerunner", name = "GitHub" },
 ]
