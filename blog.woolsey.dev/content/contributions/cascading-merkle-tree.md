@@ -2,6 +2,8 @@
 title = "cascading Merkle Tree"
 description = "A novel way to contruct a dense, multithreaded, and growable fixed depth merkle tree"
 date = 2024-04-12
+
+[taxonomies]
 tags = ["World", "Data Structures", "Zero Knowledge Proofs"]
 
 [extra]
