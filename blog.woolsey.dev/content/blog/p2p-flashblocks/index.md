@@ -20,6 +20,8 @@ id = "114948839639110660"
 
 > **📚 Source Code**: This article discusses the implementation details of [Rollup-Boost PR #373](https://github.com/flashbots/rollup-boost/pull/373). Check out the link for the latest code and documentation.
 
+> **📺 Video**: [Live Talk at Paradigm Frontiers](https://www.youtube.com/live/LOxkZcASH0s?start=15258s)
+
 # The 200ms Block Party and How the Gossip Flies
 
 Flashblocks are all about speed – blazingly fast **200ms block confirmations**, partial blocks zooming across the network, and rollup nodes chugging quadruple espressos to keep up. If that sounds wild, it is. Flashblocks is a **streaming block construction layer** for rollups that chops each block into bite-sized pieces (called *flashblocks*) and shares them continuously, rather than waiting for the whole block to be built. The result? Near-instant user confirmations, [more efficient MEV](https://oakresearch.io/en/analyses/innovations/flashblocks-towards-ultra-fast-layer2-ev-ms#:~:text=,on%20priority%20fees%2C%20reducing%20the) and potentially even higher overall throughput. Before we dive into the nitty-gritty of the peer-to-peer (P2P) propagation layer that we're building, let's refresh what Flashblocks actually are – and why they're the hottest thing in rollup town.
