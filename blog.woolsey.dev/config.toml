@@ -10,7 +10,7 @@ compile_sass = true
 # Whether to build a search index to be used later on by a JavaScript library
 build_search_index = false
 
-generate_feeds = true
+generate_feeds = false
 feed_filenames = ["rss.xml", "atom.xml"]
 
 taxonomies = [{ name = "tags", feed = true, paginate_by = 5 }]
@@ -51,6 +51,8 @@ index_format = "fuse_json"
 # auto_hide = true
 # Whether to show the Atom/RSS feed button in the nav
 show_feed = true
+# Custom feed URLs to override the default feed filenames
+feed_urls = { "rss.xml" = "blog/rss.xml", "atom.xml" = "blog/atom.xml" }
 # Whether to show the manual theme switcher in the nav
 show_theme_switcher = true
 # Whether to show the link to the source repository in the nav

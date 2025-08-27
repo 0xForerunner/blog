@@ -108,7 +108,11 @@
 						<ul>
 							{%- for feed in config.feed_filenames %}
 								<li>
-									<a href="{{ get_url(path=feed, lang=lang) }}" rel="{{ rel_attributes }}">
+									{%- if config.extra.nav.feed_urls and config.extra.nav.feed_urls[feed] -%}
+										<a href="{{ get_url(path=config.extra.nav.feed_urls[feed], lang=lang) }}" rel="{{ rel_attributes }}">
+									{%- else -%}
+										<a href="{{ get_url(path=feed, lang=lang) }}" rel="{{ rel_attributes }}">
+									{%- endif -%}
 										{%- if feed == "atom.xml" -%}
 											Atom
 										{%- else -%}
@@ -122,7 +126,11 @@
 				</li>
 			{%- elif config.generate_feeds and config.extra.nav.show_feed %}
 				<li id="feed">
-					<a class="circle" href="{{ get_url(path=config.feed_filenames[0], lang=lang) }}" title="{{ macros_translate::translate(key='feed', default='Feed', language_strings=language_strings) }}">
+					{%- if config.extra.nav.feed_urls and config.extra.nav.feed_urls[config.feed_filenames[0]] -%}
+						<a class="circle" href="{{ get_url(path=config.extra.nav.feed_urls[config.feed_filenames[0]], lang=lang) }}" title="{{ macros_translate::translate(key='feed', default='Feed', language_strings=language_strings) }}">
+					{%- else -%}
+						<a class="circle" href="{{ get_url(path=config.feed_filenames[0], lang=lang) }}" title="{{ macros_translate::translate(key='feed', default='Feed', language_strings=language_strings) }}">
+					{%- endif -%}
 						<i class="icon"></i>
 					</a>
 				</li>
