@@ -12,7 +12,7 @@ tags = ["Rollup Boost", "OP Stack", "World", "Flashbots", "Rust"]
 # banner = "banner.jpeg"
 card = "card.jpeg"
 hot = true
-hide = true
+hide = false
 
 [extra.comments]
 host = "mastodon.social"
