@@ -32,7 +32,7 @@ In my free time, you’re more likely to find me outdoors than indoors. I live n
 
 I believe the best way to learn is by doing, and the best way to teach is by example. Over the years, I’ve gone from academia to startups to big tech, and one constant is that hands-on experience beats theory (though my inner scientist still loves a good theory). I value open communication and collaboration – whether it’s pair programming or discussing ideas on a pull request, I’m always up for knowledge sharing.
 
-I’m a strong proponent of open source. Almost all the tools and frameworks I use (and build) are open source, and I love that community-driven vibe. In my view, transparency and collaboration aren’t just buzzwords; they’re how the best software gets made. I’ve also grown fond of asynchronous work culture (thanks to working with distributed teams and global open-source contributors) – being able to collaborate across time zones without missing a beat is pretty awesome for both productivity and inclusivity.
+I’m a strong proponent of open source. Almost all the tools and frameworks I use (and build) are open source, and I love that community-driven vibe. In my view, transparency and collaboration aren’t just buzzwords; they’re how the best software gets made.
 
 I also enjoy mentoring and helping new developers find their footing. Having trained newcomers in both research labs and coding teams, I’ve learned that patience, empathy, and a dash of humor go a long way in teaching.
 
