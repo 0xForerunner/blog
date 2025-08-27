@@ -123,4 +123,12 @@
 		<meta property="og:image" content="{% include 'partials/card.html' %}" />
 	{%- endif -%}
 	<meta property="og:locale" content="{{ macros_translate::translate(key='date_locale', default='en_US', language_strings=language_strings) }}" />
+
+	{# Twitter Card meta tags #}
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="{% include 'partials/title.html' %}" />
+	<meta name="twitter:description" content="{% include 'partials/description.html' %}" />
+	{%- if config.extra.card is not defined or config.extra.card != false -%}
+		<meta name="twitter:image" content="{% include 'partials/card.html' %}" />
+	{%- endif -%}
 </head>
