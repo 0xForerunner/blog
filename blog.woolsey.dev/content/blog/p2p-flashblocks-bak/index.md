@@ -2,6 +2,7 @@
 authors = ["Eric Woolsey"]
 title = "P2P Flashblocks Propagation"
 description = "Web3 native solution for preconf distribution in the OP Stack"
+draft = true
 date = 2025-07-29
 
 [taxonomies]
