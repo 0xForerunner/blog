@@ -278,3 +278,31 @@ rect.cmt-empty {
 	stroke: var(--bg-color);
 	font-weight: 400;
 }
+
+/* Static cascading-index figure */
+.cmt-spine {
+	fill: none;
+	stroke: var(--accent-color);
+	stroke-width: 7;
+	stroke-opacity: 0.35;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.cmt-svg .cmt-spine-label {
+	text-anchor: end;
+	font-size: 11px;
+	font-weight: 700;
+	fill: var(--accent-color);
+}
+
+.cmt-svg .cmt-cell-label {
+	fill: #fff;
+	font-size: 9px;
+	font-weight: 700;
+}
+
+.cmt-svg .cmt-count-label {
+	font-size: 9px;
+	opacity: 0.7;
+}

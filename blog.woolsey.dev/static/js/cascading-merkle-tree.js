@@ -106,7 +106,7 @@
 	}
 
 	// ---------------------------------------------------------------------
-	// Figure 2: the same tree stored two ways, growing in lockstep.
+	// Figure 3: the same tree stored two ways, growing in lockstep.
 	// ---------------------------------------------------------------------
 	function growWidget(fig) {
 		const D = 5;            // pretend this is 30
@@ -411,7 +411,61 @@
 		}
 	}
 
-	const FIGS = { "heap-shuffle": heapShuffle, grow: growWidget };
+	// ---------------------------------------------------------------------
+	// Figure 2: the cascading indices of an 8-leaf tree and its array.
+	// ---------------------------------------------------------------------
+	function cascadeIndex(fig) {
+		const d = 3, LW = 48, CW = 24, RH = 50, R = 13, TOP = 26, ML = 64;
+		const leafY = TOP + d * RH;
+		const arrY = leafY + 48;
+		const svg = svgRoot(fig, ML * 2 + (1 << d) * LW, arrY + 62, "Cascading indices for an 8-leaf tree. The spine 1, 2, 4, 8 runs up the left edge, and each power-of-two chunk of the array holds one spine node followed by its right subtree.");
+		const nx = (h, o) => ML + ((o << h) + (1 << h) / 2) * LW;
+		const ny = (h) => leafY - h * RH;
+		const cellX = (i) => ML + i * CW;
+
+		for (let h = d; h >= 1; h--)
+			for (let o = 0; o < 1 << (d - h); o++)
+				for (const c of [2 * o, 2 * o + 1])
+					el("line", { x1: nx(h, o), y1: ny(h), x2: nx(h - 1, c), y2: ny(h - 1), class: "cmt-edge" }, svg);
+
+		// The spine: the leftmost path, from leaf 0 to the storage root.
+		const spine = [];
+		for (let h = 0; h <= d; h++) spine.push(`${nx(h, 0)} ${ny(h)}`);
+		el("path", { d: `M${spine.join(" L")}`, class: "cmt-spine" }, svg);
+		el("text", { x: nx(1, 0) - 22, y: (ny(1) + ny(2)) / 2, class: "cmt-spine-label" }, svg, "spine");
+
+		for (let h = 0; h <= d; h++) {
+			for (let o = 0; o < 1 << (d - h); o++) {
+				const node = el("g", { class: "cmt-node" }, svg);
+				el("circle", { cx: nx(h, o), cy: ny(h), r: R, class: "cmt-under" }, node);
+				el("circle", { cx: nx(h, o), cy: ny(h), r: R, fill: colorOf(h, o) }, node);
+				el("text", { x: nx(h, o), y: ny(h) }, node, indexHeightOffset(h, o));
+			}
+		}
+		el("text", { x: ML - 10, y: leafY + 28, class: "cmt-leafno-hdr" }, svg, "leaf");
+		for (let o = 0; o < 1 << d; o++)
+			el("text", { x: nx(0, o), y: leafY + 28, class: "cmt-leafno" }, svg, o);
+
+		// The array: slot 0 holds the leaf count, then one chunk per spine node.
+		el("rect", { x: cellX(0), y: arrY, width: CW - 2, height: 22, rx: 3, class: "cmt-cell-unused" }, svg);
+		el("text", { x: cellX(0) + (CW - 2) / 2, y: arrY + 11, class: "cmt-count-label" }, svg, "n");
+		for (let h = 0; h <= d; h++) {
+			for (let o = 0; o < 1 << (d - h); o++) {
+				const i = indexHeightOffset(h, o);
+				el("rect", { x: cellX(i), y: arrY, width: CW - 2, height: 22, rx: 3, fill: colorOf(h, o) }, svg);
+				el("text", { x: cellX(i) + (CW - 2) / 2, y: arrY + 11, class: "cmt-cell-label" }, svg, i);
+			}
+		}
+		for (let k = 0; k <= d; k++) {
+			const a = 1 << k, b = (2 << k) - 1;
+			const x1 = cellX(a) + 1, x2 = cellX(b) + CW - 3, y = arrY + 30;
+			el("path", { d: `M${x1} ${y - 3} V${y} H${x2} V${y - 3}`, class: "cmt-bracket" }, svg);
+			const label = k === 0 ? "" : k === 3 ? "chunk 3: spine 8 + subtree" : `chunk ${k}`;
+			el("text", { x: (x1 + x2) / 2, y: y + 14, class: "cmt-bracket-label" }, svg, label);
+		}
+	}
+
+	const FIGS = { "heap-shuffle": heapShuffle, "cascade-index": cascadeIndex, grow: growWidget };
 	for (const fig of document.querySelectorAll("figure.cmt-fig[data-fig]")) {
 		const f = FIGS[fig.dataset.fig];
 		if (f) f(fig);

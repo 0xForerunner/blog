@@ -63,19 +63,16 @@ So here's the trick. **Array chunk [2ᵏ, 2ᵏ⁺¹) holds the spine node at hei
 
 That leaves the very first slot of the whole array, index 0, which nobody wanted. The tree keeps the leaf count there.
 
-```
-          8               spine: 1, 2, 4, 8, ...
-    4            9
- 2     5     10     11
-1  3  6  7  12 13 14 15
-```
+<figure class="cmt-fig" data-fig="cascade-index">
+<figcaption>Figure 2. Cascading indices for an 8-leaf tree. The spine (1, 2, 4, 8) runs up the left edge. Each array chunk [2ᵏ, 2ᵏ⁺¹) holds spine node 2ᵏ followed by the heap for its right subtree, and slot 0 holds the leaf count.</figcaption>
+</figure>
 
 ## See it move
 
 The figure plays on its own and loops. Pause it, or push leaves one at a time. The same tree is stored two ways, growing in lockstep: the cascading layout on top and a classic heap below. Every node and its array slot share a color, and hovering over a node highlights it in both layouts. Watch what happens each time the tree passes a power of two. The cascading array just gets longer. In the heap, every index moves to a new node and the whole array shuffles. Click a leaf number to trace its path to the root. The dashed rings mark the siblings that make up its Merkle proof. Above the stored part, the siblings are all Z values from the sparse column, so they cost nothing to read.
 
 <figure class="cmt-fig" data-fig="grow">
-<figcaption>Figure 2. The same depth-5 tree (pretend it says 30), stored two ways. Top: the cascading layout, where the array grows by appending and each chunk is one spine node plus one complete subtree. Bottom: a classic heap, where every entry moves each time the tree grows a level. In both, solid nodes are stored in the array, and dashed nodes and triangles are computed from the sparse column.</figcaption>
+<figcaption>Figure 3. The same depth-5 tree (pretend it says 30), stored two ways. Top: the cascading layout, where the array grows by appending and each chunk is one spine node plus one complete subtree. Bottom: a classic heap, where every entry moves each time the tree grows a level. In both, solid nodes are stored in the array, and dashed nodes and triangles are computed from the sparse column.</figcaption>
 </figure>
 
 ## The arithmetic
