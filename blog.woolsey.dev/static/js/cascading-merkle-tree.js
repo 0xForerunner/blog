@@ -115,7 +115,7 @@
 		const leafY = TOP + D * RH;
 		const arrY = leafY + 44;
 		const VB_W = ML * 2 + (1 << D) * W;
-		const VB_H = arrY + CH + 34;
+		const VB_H = arrY + CH + 50;
 
 		const nx = (h, o) => ML + ((o << h) + (1 << h) / 2) * W;
 		const ny = (h) => TOP + (D - h) * RH;
@@ -128,11 +128,14 @@
 		const btnStep = html("button", { type: "button" }, controls, "push()");
 		const btnReset = html("button", { type: "button" }, controls, "Reset");
 
-		const state = { n: 0, moved: { cascade: 0, classic: 0 }, leaf: null, msg: "", timer: null };
+		// `growth` remembers the most recent time the storage doubled.
+		const state = { n: 0, moved: { cascade: 0, classic: 0 }, leaf: null, growth: null, timer: null };
 		const panels = [panel("cascade", "Cascading"), panel("classic", "Classic heap")];
 
-		const status = html("p", { class: "cmt-status", "aria-live": "polite" });
-		fig.insertBefore(status, caption);
+		// Everything that changes is drawn inside the SVGs, so the figure never
+		// changes height while it animates. This hint is the only text outside.
+		const hint = html("p", { class: "cmt-status" }, null, "Click a leaf number to trace its path and Merkle proof. Hover a node to find it in both layouts.");
+		fig.insertBefore(hint, caption);
 
 		function panel(mode, title) {
 			const wrap = html("div", { class: "cmt-panel" });
@@ -144,6 +147,9 @@
 				"aria-label": `${title} layout of the tree and its backing array.`,
 			}, wrap);
 			el("text", { x: 6, y: 14, class: "cmt-panel-title" }, svg, title);
+			const statsT = el("text", { x: VB_W - 6, y: 14, class: "cmt-panel-stats" }, svg);
+			const growthT = el("text", { x: 6, y: 32, class: "cmt-panel-growth" }, svg);
+			const traceT = el("text", { x: 6, y: arrY + CH + 40, class: "cmt-panel-trace" }, svg);
 			const gVirt = el("g", {}, svg);
 			const gEdges = el("g", {}, svg);
 			const gNodes = el("g", {}, svg);
@@ -152,7 +158,6 @@
 			const gCells = el("g", {}, svg);
 			el("text", { x: ML - 4, y: leafY + 26, class: "cmt-leafno-hdr" }, svg, "leaf");
 			const gLeafNo = el("g", {}, svg);
-			const trace = html("p", { class: "cmt-trace" }, wrap);
 
 			const nodes = new Map();
 			const cells = new Map();
@@ -294,8 +299,14 @@
 					el("text", { x: (x1 + x2) / 2, y: y + 14, class: "cmt-bracket-label" }, gBrackets, label);
 				}
 
-				// Trace text for this layout.
-				trace.replaceChildren();
+				// Header and footer text for this layout.
+				statsT.textContent = `num_leaves ${n} · len ${2 << d} · moved ${state.moved[mode]}`;
+				const g = state.growth;
+				growthT.textContent = !g ? ""
+					: `Grew ${g.from} → ${g.to} leaves: `
+						+ (mode === "cascade" ? `appended ${g.appended} slots, moved 0` : `moved all ${g.moved} entries`);
+
+				traceT.textContent = "";
 				if (state.leaf !== null) {
 					const L = state.leaf;
 					const parts = [];
@@ -305,8 +316,7 @@
 						: `leaf ${L} → 2^${d} + ${L} = ${classicIndex(0, L, d)}`;
 					const zs = [];
 					for (let h = d; h < D; h++) zs.push(`Z${sub(h)}`);
-					html("code", {}, trace, head);
-					trace.append(` · path ${parts.join(" → ")}` + (zs.length ? ` → sparse column ${zs.join(", ")} → root` : " = root"));
+					traceT.textContent = `${head} · path ${parts.join(" → ")}` + (zs.length ? ` → sparse column ${zs.join(", ")} → root` : " = root");
 				}
 			}
 
@@ -319,55 +329,56 @@
 
 		function render() {
 			for (const p of panels) p.render();
-			const len = 2 << storageDepth(state.n);
-			const hint = state.n === 0
-				? " Press push() to insert a leaf."
-				: state.leaf === null ? " Click a leaf number to trace its path and Merkle proof." : "";
-			status.textContent = (state.msg ? `${state.msg} ` : "")
-				+ `num_leaves = ${state.n} · storage.len() = ${len} · entries moved by growth so far: cascading ${state.moved.cascade}, classic heap ${state.moved.classic}.`
-				+ hint;
 		}
 
 		function push() {
-			if (state.n >= MAX_LEAVES) return false;
+			if (state.n >= MAX_LEAVES) return;
 			const before = storageDepth(state.n), after = storageDepth(state.n + 1);
-			state.msg = "";
 			if (state.n > 0 && after > before) {
 				// Every stored node of the old tree gets a new heap index; none move
 				// in the cascading layout, which just appends a new chunk.
-				const old = (2 << before) - 1;
-				state.moved.classic += old;
-				state.msg = `Storage full. Cascading appended ${1 << after} empty slots and moved nothing; the classic heap moved all ${old} entries.`;
+				const moved = (2 << before) - 1;
+				state.moved.classic += moved;
+				state.growth = { from: 1 << before, to: 1 << after, appended: 1 << after, moved };
 			}
 			state.n++;
 			render();
-			return state.n < MAX_LEAVES;
+		}
+
+		function clear() {
+			state.n = 0;
+			state.leaf = null;
+			state.growth = null;
+			state.moved = { cascade: 0, classic: 0 };
+			render();
+		}
+
+		// Playing loops forever: fill the tree, hold for a moment, start over.
+		function tick() {
+			if (state.n >= MAX_LEAVES) clear();
+			else push();
+			state.timer = setTimeout(tick, state.n >= MAX_LEAVES ? 3000 : 1100);
 		}
 
 		function stop() {
-			clearInterval(state.timer);
+			clearTimeout(state.timer);
 			state.timer = null;
 			btnPlay.textContent = "▶ Play";
 		}
 
 		function play() {
 			if (state.timer) return stop();
-			if (state.n >= MAX_LEAVES) reset();
 			btnPlay.textContent = "❚❚ Pause";
-			state.timer = setInterval(() => { if (!push()) stop(); }, 1100);
+			tick();
 		}
 
 		function reset() {
 			stop();
-			state.n = 0;
-			state.leaf = null;
-			state.msg = "";
-			state.moved = { cascade: 0, classic: 0 };
-			render();
+			clear();
 		}
 
 		btnPlay.addEventListener("click", play);
-		btnStep.addEventListener("click", () => { stop(); push(); });
+		btnStep.addEventListener("click", () => { stop(); if (state.n >= MAX_LEAVES) clear(); else push(); });
 		btnReset.addEventListener("click", reset);
 
 		// Hover a node to find it in both layouts and both arrays; click a leaf
