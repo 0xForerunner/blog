@@ -82,7 +82,7 @@ Press play, or push leaves one at a time. Every node and its array slot share a 
 
 ## The arithmetic
 
-With that picture in your head, the index functions in [`storage_ops.rs`](https://github.com/worldcoin/semaphore-rs/pull/70/files) read almost like prose.
+With that picture in mind, here are the index functions from [`storage_ops.rs`](https://github.com/worldcoin/semaphore-rs/pull/70/files).
 
 ```rust
 // leaves are 0 indexed
