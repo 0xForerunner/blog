@@ -1,0 +1,280 @@
+/* Figures for the "Cascading Merkle Tree" post. */
+
+.cmt-fig {
+	margin: 2rem 0;
+}
+
+.cmt-svg {
+	display: block;
+	width: 100%;
+	height: auto;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	user-select: none;
+}
+
+.cmt-svg text {
+	fill: var(--fg-color);
+	font-size: 10px;
+	text-anchor: middle;
+	dominant-baseline: central;
+}
+
+.cmt-edge {
+	stroke: var(--fg-color);
+	stroke-opacity: 0.35;
+	stroke-width: 1.25;
+}
+
+.cmt-dashed {
+	stroke-dasharray: 3 3;
+}
+
+/* Tree nodes */
+.cmt-node circle {
+	stroke: var(--bg-color);
+	stroke-width: 1.5;
+}
+
+.cmt-node text {
+	fill: #fff;
+	font-weight: 700;
+}
+
+.cmt-node,
+.cmt-cellg {
+	transition: opacity 0.4s ease;
+}
+
+.cmt-node.cmt-empty circle,
+.cmt-cellg.cmt-empty rect,
+rect.cmt-empty {
+	fill-opacity: 0.22;
+}
+
+.cmt-node.cmt-empty text,
+.cmt-cellg.cmt-empty text {
+	fill: var(--fg-color);
+	font-weight: 400;
+	opacity: 0.7;
+}
+
+.cmt-new {
+	opacity: 0;
+}
+
+/* Virtual part of the tree (never stored) */
+.cmt-vnode circle {
+	fill: none;
+	stroke: var(--fg-color);
+	stroke-opacity: 0.5;
+	stroke-dasharray: 3 3;
+}
+
+.cmt-ztri {
+	fill: var(--fg-color);
+	fill-opacity: 0.05;
+	stroke: var(--fg-color);
+	stroke-opacity: 0.3;
+	stroke-dasharray: 3 3;
+}
+
+.cmt-svg .cmt-zlabel {
+	font-size: 12px;
+	font-style: italic;
+	opacity: 0.6;
+}
+
+.cmt-svg .cmt-rootlabel {
+	font-size: 10px;
+	opacity: 0.7;
+}
+
+/* Backing array */
+.cmt-cellg {
+	transition: transform 0.7s cubic-bezier(0.6, 0, 0.3, 1), opacity 0.4s ease;
+}
+
+.cmt-cellg text {
+	fill: #fff;
+	font-size: 9px;
+	font-weight: 700;
+}
+
+.cmt-count rect,
+.cmt-cell-unused {
+	fill: none;
+	stroke: var(--fg-color);
+	stroke-opacity: 0.4;
+	stroke-dasharray: 2 2;
+}
+
+.cmt-svg .cmt-count text {
+	fill: var(--fg-color);
+	font-weight: 400;
+	font-size: 8px;
+}
+
+.cmt-svg .cmt-idx {
+	font-size: 9px;
+	opacity: 0.55;
+}
+
+.cmt-bracket {
+	fill: none;
+	stroke: var(--fg-color);
+	stroke-opacity: 0.4;
+}
+
+.cmt-svg .cmt-bracket-label,
+.cmt-svg .cmt-leafno,
+.cmt-svg .cmt-leafno-hdr {
+	font-size: 9px;
+	opacity: 0.6;
+}
+
+.cmt-svg .cmt-leafno-hdr {
+	text-anchor: end;
+}
+
+.cmt-svg .cmt-leafno.cmt-clickable {
+	cursor: pointer;
+	opacity: 0.9;
+	text-decoration: underline;
+}
+
+.cmt-svg .cmt-title {
+	font-size: 12px;
+	opacity: 0.8;
+}
+
+.cmt-svg .cmt-arrow {
+	font-size: 28px;
+	opacity: 0.6;
+}
+
+/* Hover linking and proof tracing */
+.cmt-hover circle,
+.cmt-hover rect {
+	stroke: var(--fg-color);
+	stroke-width: 2.5;
+}
+
+.cmt-path circle,
+.cmt-path rect,
+.cmt-vnode.cmt-path circle {
+	stroke: var(--fg-color);
+	stroke-opacity: 1;
+	stroke-width: 3;
+	stroke-dasharray: none;
+}
+
+.cmt-sib circle,
+.cmt-sib rect,
+.cmt-ztri.cmt-sib {
+	stroke: var(--fg-color);
+	stroke-opacity: 1;
+	stroke-width: 2;
+	stroke-dasharray: 3 2;
+}
+
+.cmt-ztri.cmt-sib {
+	fill-opacity: 0.15;
+}
+
+/* Controls */
+.cmt-controls {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	align-items: center;
+	margin-bottom: 0.75rem;
+}
+
+.cmt-controls button {
+	font: inherit;
+	font-size: 0.875rem;
+	padding: 0.3rem 0.8rem;
+	border: 1px solid color-mix(in srgb, var(--fg-color) 25%, transparent);
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--fg-color) 5%, transparent);
+	color: var(--fg-color);
+	cursor: pointer;
+}
+
+.cmt-controls button:hover {
+	background: color-mix(in srgb, var(--fg-color) 12%, transparent);
+}
+
+.cmt-panel + .cmt-panel {
+	margin-top: 0.75rem;
+	padding-top: 0.5rem;
+	border-top: 1px dashed color-mix(in srgb, var(--fg-color) 20%, transparent);
+}
+
+.cmt-svg .cmt-panel-title {
+	text-anchor: start;
+	font-size: 13px;
+	font-weight: 700;
+	opacity: 0.85;
+}
+
+.cmt-status {
+	font-size: 0.85rem;
+	margin: 0.4rem 0 0;
+	opacity: 0.85;
+}
+
+.cmt-svg .cmt-panel-stats {
+	text-anchor: end;
+	opacity: 0.7;
+}
+
+.cmt-svg .cmt-panel-growth {
+	text-anchor: start;
+	font-size: 11px;
+	fill: var(--accent-color);
+}
+
+.cmt-svg .cmt-panel-trace {
+	text-anchor: start;
+	font-size: 10.5px;
+}
+
+/* Opaque backing so edges don't show through translucent nodes */
+.cmt-svg circle.cmt-under {
+	fill: var(--bg-color);
+	fill-opacity: 1;
+	stroke: none;
+}
+
+/* On phones, keep the interactive figure legible and let it scroll sideways */
+@media (max-width: 600px) {
+	.cmt-fig[data-fig="grow"] {
+		overflow-x: auto;
+		/* Don't let the SVG's min-width widen the article column */
+		contain: inline-size;
+		min-width: 0;
+	}
+
+	.cmt-fig[data-fig="grow"] .cmt-svg {
+		min-width: 620px;
+	}
+}
+
+/* Index labels travel between nodes when the layout renumbers the tree */
+.cmt-svg .cmt-label {
+	fill: #fff;
+	font-weight: 700;
+	paint-order: stroke;
+	stroke: rgb(0 0 0 / 0.6);
+	stroke-width: 3px;
+	stroke-linejoin: round;
+	pointer-events: none;
+	transition: transform 0.9s cubic-bezier(0.6, 0, 0.3, 1), opacity 0.4s ease;
+}
+
+.cmt-svg .cmt-label.cmt-empty {
+	fill: var(--fg-color);
+	stroke: var(--bg-color);
+	font-weight: 400;
+}
