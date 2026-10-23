@@ -205,24 +205,17 @@ rect.cmt-empty {
 	background: color-mix(in srgb, var(--fg-color) 12%, transparent);
 }
 
-.cmt-modes {
-	display: inline-flex;
-	margin-left: auto;
+.cmt-panel + .cmt-panel {
+	margin-top: 0.75rem;
+	padding-top: 0.5rem;
+	border-top: 1px dashed color-mix(in srgb, var(--fg-color) 20%, transparent);
 }
 
-.cmt-modes button:first-child {
-	border-radius: 999px 0 0 999px;
-}
-
-.cmt-modes button:last-child {
-	border-radius: 0 999px 999px 0;
-	border-left: none;
-}
-
-.cmt-modes button[aria-pressed="true"] {
-	background: var(--accent-color);
-	border-color: var(--accent-color);
-	color: #fff;
+.cmt-svg .cmt-panel-title {
+	text-anchor: start;
+	font-size: 13px;
+	font-weight: 700;
+	opacity: 0.85;
 }
 
 .cmt-status,

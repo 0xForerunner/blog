@@ -106,207 +106,226 @@
 	}
 
 	// ---------------------------------------------------------------------
-	// Figure 2: the interactive cascading tree.
+	// Figure 2: the same tree stored two ways, growing in lockstep.
 	// ---------------------------------------------------------------------
 	function growWidget(fig) {
 		const D = 5;            // pretend this is 30
 		const MAX_LEAVES = 16;  // storage grows to depth 4
-		const W = 24, ML = 36, RH = 46, TOP = 22, R = 10, CH = 22;
+		const W = 24, ML = 36, RH = 46, TOP = 30, R = 10, CH = 22;
 		const leafY = TOP + D * RH;
 		const arrY = leafY + 44;
 		const VB_W = ML * 2 + (1 << D) * W;
-		const VB_H = arrY + CH + 50;
+		const VB_H = arrY + CH + 34;
 
 		const nx = (h, o) => ML + ((o << h) + (1 << h) / 2) * W;
 		const ny = (h) => TOP + (D - h) * RH;
 		const cellX = (i) => ML + i * W;
 
+		const caption = fig.querySelector("figcaption");
 		const controls = html("div", { class: "cmt-controls" });
-		fig.insertBefore(controls, fig.querySelector("figcaption"));
+		fig.insertBefore(controls, caption);
 		const btnPlay = html("button", { type: "button" }, controls, "▶ Play");
 		const btnStep = html("button", { type: "button" }, controls, "push()");
 		const btnReset = html("button", { type: "button" }, controls, "Reset");
-		const modes = html("div", { class: "cmt-modes", role: "group", "aria-label": "Array layout" }, controls);
-		const btnCas = html("button", { type: "button", "aria-pressed": "true" }, modes, "Cascading");
-		const btnHeap = html("button", { type: "button", "aria-pressed": "false" }, modes, "Classic heap");
 
-		const svg = svgRoot(fig, VB_W, VB_H, "Interactive cascading Merkle tree. Push leaves to watch the backing array grow.");
-		const gVirt = el("g", {}, svg);
-		const gEdges = el("g", {}, svg);
-		const gNodes = el("g", {}, svg);
-		const gLabels = el("g", {}, svg);
-		const gBrackets = el("g", {}, svg);
-		const gCells = el("g", {}, svg);
-		el("text", { x: ML - 4, y: leafY + 26, class: "cmt-leafno-hdr" }, svg, "leaf");
-		const gLeafNo = el("g", {}, svg);
+		const state = { n: 0, moved: { cascade: 0, classic: 0 }, leaf: null, msg: "", timer: null };
+		const panels = [panel("cascade", "Cascading"), panel("classic", "Classic heap")];
 
 		const status = html("p", { class: "cmt-status", "aria-live": "polite" });
-		fig.insertBefore(status, fig.querySelector("figcaption"));
-		const trace = html("p", { class: "cmt-trace" });
-		fig.insertBefore(trace, fig.querySelector("figcaption"));
+		fig.insertBefore(status, caption);
 
-		const state = { n: 0, mode: "cascade", moved: { cascade: 0, classic: 0 }, leaf: null, msg: "", timer: null };
-		const nodes = new Map();
-		const cells = new Map();
-		// Index labels are keyed by index, not by node, so that when a layout
-		// renumbers the tree each index visibly travels to its new node.
-		const labels = new Map();
+		function panel(mode, title) {
+			const wrap = html("div", { class: "cmt-panel" });
+			fig.insertBefore(wrap, caption);
+			const svg = el("svg", {
+				viewBox: `0 0 ${VB_W} ${VB_H}`,
+				class: "cmt-svg",
+				role: "img",
+				"aria-label": `${title} layout of the tree and its backing array.`,
+			}, wrap);
+			el("text", { x: 6, y: 14, class: "cmt-panel-title" }, svg, title);
+			const gVirt = el("g", {}, svg);
+			const gEdges = el("g", {}, svg);
+			const gNodes = el("g", {}, svg);
+			const gLabels = el("g", {}, svg);
+			const gBrackets = el("g", {}, svg);
+			const gCells = el("g", {}, svg);
+			el("text", { x: ML - 4, y: leafY + 26, class: "cmt-leafno-hdr" }, svg, "leaf");
+			const gLeafNo = el("g", {}, svg);
+			const trace = html("p", { class: "cmt-trace" }, wrap);
 
-		const indexOf = (h, o, d) => (state.mode === "cascade" ? indexHeightOffset(h, o) : classicIndex(h, o, d));
+			const nodes = new Map();
+			const cells = new Map();
+			// Index labels are keyed by index, not by node, so that when a layout
+			// renumbers the tree each index visibly travels to its new node.
+			const labels = new Map();
 
-		function upsertNode(h, o) {
-			const k = `${h}-${o}`;
-			let n = nodes.get(k);
-			if (!n) {
-				const g = el("g", { class: "cmt-node cmt-new", "data-k": k }, gNodes);
-				el("circle", { cx: nx(h, o), cy: ny(h), r: R, class: "cmt-under" }, g);
-				const c = el("circle", { cx: nx(h, o), cy: ny(h), r: R, fill: colorOf(h, o) }, g);
-				n = { g, c };
-				nodes.set(k, n);
-				requestAnimationFrame(() => requestAnimationFrame(() => g.classList.remove("cmt-new")));
+			const indexOf = (h, o, d) => (mode === "cascade" ? indexHeightOffset(h, o) : classicIndex(h, o, d));
+
+			function upsertNode(h, o) {
+				const k = `${h}-${o}`;
+				let n = nodes.get(k);
+				if (!n) {
+					const g = el("g", { class: "cmt-node cmt-new", "data-k": k }, gNodes);
+					el("circle", { cx: nx(h, o), cy: ny(h), r: R, class: "cmt-under" }, g);
+					el("circle", { cx: nx(h, o), cy: ny(h), r: R, fill: colorOf(h, o) }, g);
+					n = { g };
+					nodes.set(k, n);
+					requestAnimationFrame(() => requestAnimationFrame(() => g.classList.remove("cmt-new")));
+				}
+				return n;
 			}
-			return n;
-		}
 
-		function upsertLabel(idx, x, y) {
-			let t = labels.get(idx);
-			if (!t) {
-				t = el("text", { x: 0, y: 0, class: "cmt-label cmt-new" }, gLabels, idx);
-				t.style.transform = `translate(${x}px, ${y}px)`;
-				labels.set(idx, t);
-				requestAnimationFrame(() => requestAnimationFrame(() => t.classList.remove("cmt-new")));
+			function upsertLabel(idx, x, y) {
+				let t = labels.get(idx);
+				if (!t) {
+					t = el("text", { x: 0, y: 0, class: "cmt-label cmt-new" }, gLabels, idx);
+					t.style.transform = `translate(${x}px, ${y}px)`;
+					labels.set(idx, t);
+					requestAnimationFrame(() => requestAnimationFrame(() => t.classList.remove("cmt-new")));
+				}
+				return t;
 			}
-			return t;
-		}
 
-		function upsertCell(k, color) {
-			let c = cells.get(k);
-			if (!c) {
-				const g = el("g", { class: "cmt-cellg cmt-new", "data-k": k }, gCells);
-				const r = el("rect", { x: 0, y: 0, width: W - 2, height: CH, rx: 3, fill: color }, g);
-				const t = el("text", { x: (W - 2) / 2, y: CH / 2 }, g);
-				c = { g, r, t, fresh: true };
-				cells.set(k, c);
-				requestAnimationFrame(() => requestAnimationFrame(() => g.classList.remove("cmt-new")));
+			function upsertCell(k, color) {
+				let c = cells.get(k);
+				if (!c) {
+					const g = el("g", { class: "cmt-cellg cmt-new", "data-k": k }, gCells);
+					el("rect", { x: 0, y: 0, width: W - 2, height: CH, rx: 3, fill: color }, g);
+					const t = el("text", { x: (W - 2) / 2, y: CH / 2 }, g);
+					c = { g, t };
+					cells.set(k, c);
+					requestAnimationFrame(() => requestAnimationFrame(() => g.classList.remove("cmt-new")));
+				}
+				return c;
 			}
-			return c;
-		}
 
-		function render() {
-			const { n } = state;
-			const d = storageDepth(n);
-			const len = 2 << d;
-			const seen = new Set();
-			const seenLabels = new Set();
+			function render() {
+				const { n } = state;
+				const d = storageDepth(n);
+				const seen = new Set();
+				const seenLabels = new Set();
 
-			// Trace: the path to the root and the proof siblings.
-			const path = new Set(), sibs = new Set();
-			if (state.leaf !== null) {
-				for (let h = 0; h <= D; h++) path.add(`${h}-${state.leaf >> h}`);
-				for (let h = 0; h < D; h++) sibs.add(`${h}-${(state.leaf >> h) ^ 1}`);
-			}
-			const traceCls = (k) => (path.has(k) ? " cmt-path" : sibs.has(k) ? " cmt-sib" : "");
+				// Trace: the path to the root and the proof siblings.
+				const path = new Set(), sibs = new Set();
+				if (state.leaf !== null) {
+					for (let h = 0; h <= D; h++) path.add(`${h}-${state.leaf >> h}`);
+					for (let h = 0; h < D; h++) sibs.add(`${h}-${(state.leaf >> h) ^ 1}`);
+				}
+				const traceCls = (k) => (path.has(k) ? " cmt-path" : sibs.has(k) ? " cmt-sib" : "");
+				const keepNew = (e) => (e.classList.contains("cmt-new") ? " cmt-new" : "");
 
-			// Edges.
-			gEdges.replaceChildren();
-			for (let h = 1; h <= d; h++)
-				for (let o = 0; o < 1 << (d - h); o++)
-					for (const c of [2 * o, 2 * o + 1])
-						el("line", { x1: nx(h, o), y1: ny(h), x2: nx(h - 1, c), y2: ny(h - 1), class: "cmt-edge" }, gEdges);
+				// Edges.
+				gEdges.replaceChildren();
+				for (let h = 1; h <= d; h++)
+					for (let o = 0; o < 1 << (d - h); o++)
+						for (const c of [2 * o, 2 * o + 1])
+							el("line", { x1: nx(h, o), y1: ny(h), x2: nx(h - 1, c), y2: ny(h - 1), class: "cmt-edge" }, gEdges);
 
-			// The virtual part above storage: the spine plus empty subtrees,
-			// whose hashes come from the precomputed sparse column.
-			gVirt.replaceChildren();
-			for (let h = d + 1; h <= D; h++) {
-				const kz = `${h - 1}-1`;
-				const left = 1 << (h - 1), right = 1 << h;
-				el("line", { x1: nx(h, 0), y1: ny(h), x2: nx(h - 1, 0), y2: ny(h - 1), class: "cmt-edge cmt-dashed" }, gVirt);
-				el("line", { x1: nx(h, 0), y1: ny(h), x2: nx(h - 1, 1), y2: ny(h - 1), class: "cmt-edge cmt-dashed" }, gVirt);
-				el("path", {
-					d: `M${nx(h - 1, 1)} ${ny(h - 1)} L${ML + right * W - 3} ${leafY + 8} L${ML + left * W + 3} ${leafY + 8} Z`,
-					class: "cmt-ztri" + traceCls(kz),
-				}, gVirt);
-				el("text", { x: nx(h - 1, 1), y: ny(h - 1) + (leafY - ny(h - 1)) * 0.6, class: "cmt-zlabel" + traceCls(kz) }, gVirt, `Z${sub(h - 1)}`);
-				const vg = el("g", { class: "cmt-vnode" + traceCls(`${h}-0`) }, gVirt);
-				el("circle", { cx: nx(h, 0), cy: ny(h), r: R, class: "cmt-under" }, vg);
-				el("circle", { cx: nx(h, 0), cy: ny(h), r: R }, vg);
-				if (h === D) el("text", { x: nx(h, 0), y: ny(h) - R - 6, class: "cmt-rootlabel" }, gVirt, "root");
-			}
-			if (d === D) el("text", { x: nx(D, 0), y: ny(D) - R - 6, class: "cmt-rootlabel" }, gVirt, "root");
+				// The virtual part above storage: the spine plus empty subtrees,
+				// whose hashes come from the precomputed sparse column.
+				gVirt.replaceChildren();
+				for (let h = d + 1; h <= D; h++) {
+					const kz = `${h - 1}-1`;
+					const left = 1 << (h - 1), right = 1 << h;
+					el("line", { x1: nx(h, 0), y1: ny(h), x2: nx(h - 1, 0), y2: ny(h - 1), class: "cmt-edge cmt-dashed" }, gVirt);
+					el("line", { x1: nx(h, 0), y1: ny(h), x2: nx(h - 1, 1), y2: ny(h - 1), class: "cmt-edge cmt-dashed" }, gVirt);
+					el("path", {
+						d: `M${nx(h - 1, 1)} ${ny(h - 1)} L${ML + right * W - 3} ${leafY + 8} L${ML + left * W + 3} ${leafY + 8} Z`,
+						class: "cmt-ztri" + traceCls(kz),
+					}, gVirt);
+					el("text", { x: nx(h - 1, 1), y: ny(h - 1) + (leafY - ny(h - 1)) * 0.6, class: "cmt-zlabel" + traceCls(kz) }, gVirt, `Z${sub(h - 1)}`);
+					const vg = el("g", { class: "cmt-vnode" + traceCls(`${h}-0`) }, gVirt);
+					el("circle", { cx: nx(h, 0), cy: ny(h), r: R, class: "cmt-under" }, vg);
+					el("circle", { cx: nx(h, 0), cy: ny(h), r: R }, vg);
+				}
+				el("text", { x: nx(D, 0), y: ny(D) - R - 6, class: "cmt-rootlabel" }, gVirt, "root");
 
-			// Stored nodes and their array cells.
-			for (let h = 0; h <= d; h++) {
-				for (let o = 0; o < 1 << (d - h); o++) {
-					const k = `${h}-${o}`;
-					const filled = o << h < n;
-					const idx = indexOf(h, o, d);
-					seen.add(k);
+				// Stored nodes, their index labels, and their array cells.
+				for (let h = 0; h <= d; h++) {
+					for (let o = 0; o < 1 << (d - h); o++) {
+						const k = `${h}-${o}`;
+						const filled = o << h < n;
+						const idx = indexOf(h, o, d);
+						const empty = filled ? "" : " cmt-empty";
+						seen.add(k);
+						seenLabels.add(idx);
 
-					const node = upsertNode(h, o);
-					const lab = upsertLabel(idx, nx(h, o), ny(h));
-					lab.style.transform = `translate(${nx(h, o)}px, ${ny(h)}px)`;
-					lab.setAttribute("class", "cmt-label" + (filled ? "" : " cmt-empty") + (lab.classList.contains("cmt-new") ? " cmt-new" : ""));
-					seenLabels.add(idx);
-					node.g.setAttribute("class", "cmt-node" + (filled ? "" : " cmt-empty") + traceCls(k) + (node.g.classList.contains("cmt-new") ? " cmt-new" : ""));
+						const node = upsertNode(h, o);
+						node.g.setAttribute("class", "cmt-node" + empty + traceCls(k) + keepNew(node.g));
 
-					const cell = upsertCell(k, colorOf(h, o));
-					cell.t.textContent = idx;
-					cell.g.style.transform = `translate(${cellX(idx)}px, ${arrY}px)`;
-					cell.g.setAttribute("class", "cmt-cellg" + (filled ? "" : " cmt-empty") + traceCls(k) + (cell.g.classList.contains("cmt-new") ? " cmt-new" : ""));
+						const lab = upsertLabel(idx, nx(h, o), ny(h));
+						lab.style.transform = `translate(${nx(h, o)}px, ${ny(h)}px)`;
+						lab.setAttribute("class", "cmt-label" + empty + keepNew(lab));
+
+						const cell = upsertCell(k, colorOf(h, o));
+						cell.t.textContent = idx;
+						cell.g.style.transform = `translate(${cellX(idx)}px, ${arrY}px)`;
+						cell.g.setAttribute("class", "cmt-cellg" + empty + traceCls(k) + keepNew(cell.g));
+					}
+				}
+
+				// Slot 0: the leaf counter in the cascading layout, wasted in a heap.
+				const zero = upsertCell("count", "transparent");
+				zero.g.style.transform = `translate(${cellX(0)}px, ${arrY}px)`;
+				zero.g.setAttribute("class", "cmt-cellg cmt-count");
+				zero.t.textContent = mode === "cascade" ? `n=${n}` : "—";
+				seen.add("count");
+
+				for (const [k, v] of nodes) if (!seen.has(k)) { v.g.remove(); nodes.delete(k); }
+				for (const [k, v] of cells) if (!seen.has(k)) { v.g.remove(); cells.delete(k); }
+				for (const [k, v] of labels) if (!seenLabels.has(k)) { v.remove(); labels.delete(k); }
+
+				// Leaf numbers under the leaf row.
+				gLeafNo.replaceChildren();
+				for (let o = 0; o < 1 << d; o++)
+					el("text", { x: nx(0, o), y: leafY + 26, class: "cmt-leafno" + (o < n ? " cmt-clickable" : ""), "data-k": `0-${o}` }, gLeafNo, o);
+
+				// Brackets under the array: chunks for cascading, rows for a heap.
+				gBrackets.replaceChildren();
+				for (let k = 0; k <= d; k++) {
+					const a = 1 << k, b = (2 << k) - 1;
+					const x1 = cellX(a) + 1, x2 = cellX(b) + W - 3, y = arrY + CH + 8;
+					el("path", { d: `M${x1} ${y - 3} V${y} H${x2} V${y - 3}`, class: "cmt-bracket" }, gBrackets);
+					if (k < 2) continue; // too narrow to label
+					const label = mode === "cascade"
+						? (k === 2 ? "chunk 2" : `chunk ${k}: spine ${a} + subtree`)
+						: (k === d ? "leaves" : `height ${d - k}`);
+					el("text", { x: (x1 + x2) / 2, y: y + 14, class: "cmt-bracket-label" }, gBrackets, label);
+				}
+
+				// Trace text for this layout.
+				trace.replaceChildren();
+				if (state.leaf !== null) {
+					const L = state.leaf;
+					const parts = [];
+					for (let h = 0; h <= d; h++) parts.push(indexOf(h, L >> h, d));
+					const head = mode === "cascade"
+						? `index_from_leaf(${L}) = ${L} + next_pow2(${L + 1}) = ${indexFromLeaf(L)}`
+						: `leaf ${L} → 2^${d} + ${L} = ${classicIndex(0, L, d)}`;
+					const zs = [];
+					for (let h = d; h < D; h++) zs.push(`Z${sub(h)}`);
+					html("code", {}, trace, head);
+					trace.append(` · path ${parts.join(" → ")}` + (zs.length ? ` → sparse column ${zs.join(", ")} → root` : " = root"));
 				}
 			}
 
-			// Slot 0: the leaf counter in the cascading layout, wasted in a heap.
-			const zero = upsertCell("count", "transparent");
-			zero.g.style.transform = `translate(${cellX(0)}px, ${arrY}px)`;
-			zero.g.setAttribute("class", "cmt-cellg cmt-count");
-			zero.t.textContent = state.mode === "cascade" ? `n=${n}` : "—";
-			seen.add("count");
-
-			for (const [k, v] of nodes) if (!seen.has(k)) { v.g.remove(); nodes.delete(k); }
-			for (const [k, v] of cells) if (!seen.has(k)) { v.g.remove(); cells.delete(k); }
-			for (const [k, v] of labels) if (!seenLabels.has(k)) { v.remove(); labels.delete(k); }
-
-			// Leaf numbers under the leaf row.
-			gLeafNo.replaceChildren();
-			for (let o = 0; o < 1 << d; o++)
-				el("text", { x: nx(0, o), y: leafY + 26, class: "cmt-leafno" + (o < n ? " cmt-clickable" : ""), "data-k": `0-${o}` }, gLeafNo, o);
-
-			// Brackets under the array: chunks for cascading, rows for a heap.
-			gBrackets.replaceChildren();
-			for (let k = 0; k <= d; k++) {
-				const a = 1 << k, b = (2 << k) - 1;
-				const x1 = cellX(a) + 1, x2 = cellX(b) + W - 3, y = arrY + CH + 8;
-				el("path", { d: `M${x1} ${y - 3} V${y} H${x2} V${y - 3}`, class: "cmt-bracket" }, gBrackets);
-				if (k < 2) continue; // too narrow to label
-				const label = state.mode === "cascade"
-					? (k === 2 ? "chunk 2" : `chunk ${k}: spine ${a} + subtree`)
-					: (k === d ? "leaves" : `height ${d - k}`);
-				el("text", { x: (x1 + x2) / 2, y: y + 14, class: "cmt-bracket-label" }, gBrackets, label);
+			function hover(k) {
+				for (const m of [nodes, cells]) for (const [kk, v] of m) v.g.classList.toggle("cmt-hover", kk === k);
 			}
 
-			// Status and trace text.
-			const s = `num_leaves = ${n} · storage.len() = ${len} · entries moved by growth so far: cascading ${state.moved.cascade}, classic heap ${state.moved.classic}`;
-			status.textContent = state.msg ? `${state.msg} ${s}` : s;
+			return { svg, render, hover };
+		}
 
-			trace.replaceChildren();
-			if (state.leaf === null) {
-				trace.textContent = n ? "Click a leaf number to trace its path and Merkle proof." : "Press push() to insert a leaf.";
-			} else {
-				const L = state.leaf;
-				const parts = [];
-				for (let h = 0; h <= d; h++) parts.push(indexOf(h, L >> h, d));
-				const head = state.mode === "cascade"
-					? `index_from_leaf(${L}) = ${L} + next_pow2(${L + 1}) = ${indexFromLeaf(L)}`
-					: `leaf ${L} → 2^${d} + ${L} = ${classicIndex(0, L, d)}`;
-				const zs = [];
-				for (let h = d; h < D; h++) zs.push(`Z${sub(h)}`);
-				html("code", {}, trace, head);
-				trace.append(` · path ${parts.join(" → ")}` + (zs.length ? ` → sparse column ${zs.join(", ")} → root` : " = root"));
-			}
-
-			btnCas.setAttribute("aria-pressed", state.mode === "cascade");
-			btnHeap.setAttribute("aria-pressed", state.mode === "classic");
+		function render() {
+			for (const p of panels) p.render();
+			const len = 2 << storageDepth(state.n);
+			const hint = state.n === 0
+				? " Press push() to insert a leaf."
+				: state.leaf === null ? " Click a leaf number to trace its path and Merkle proof." : "";
+			status.textContent = (state.msg ? `${state.msg} ` : "")
+				+ `num_leaves = ${state.n} · storage.len() = ${len} · entries moved by growth so far: cascading ${state.moved.cascade}, classic heap ${state.moved.classic}.`
+				+ hint;
 		}
 
 		function push() {
@@ -318,9 +337,7 @@
 				// in the cascading layout, which just appends a new chunk.
 				const old = (2 << before) - 1;
 				state.moved.classic += old;
-				state.msg = state.mode === "cascade"
-					? `Storage full: appended ${1 << after} empty slots, moved nothing.`
-					: `Storage full: reallocated and moved all ${old} entries.`;
+				state.msg = `Storage full. Cascading appended ${1 << after} empty slots and moved nothing; the classic heap moved all ${old} entries.`;
 			}
 			state.n++;
 			render();
@@ -352,26 +369,22 @@
 		btnPlay.addEventListener("click", play);
 		btnStep.addEventListener("click", () => { stop(); push(); });
 		btnReset.addEventListener("click", reset);
-		btnCas.addEventListener("click", () => { state.mode = "cascade"; state.msg = ""; render(); });
-		btnHeap.addEventListener("click", () => { state.mode = "classic"; state.msg = ""; render(); });
 
-		// Hover a node to find its cell (and vice versa); click a leaf to trace it.
+		// Hover a node to find it in both layouts and both arrays; click a leaf
+		// to trace it in both.
 		const keyAt = (e) => e.target.closest && e.target.closest("[data-k]")?.getAttribute("data-k");
-		svg.addEventListener("pointerover", (e) => {
-			const k = keyAt(e);
-			for (const m of [nodes, cells]) for (const [kk, v] of m) v.g.classList.toggle("cmt-hover", kk === k);
-		});
-		svg.addEventListener("pointerleave", () => {
-			for (const m of [nodes, cells]) for (const v of m.values()) v.g.classList.remove("cmt-hover");
-		});
-		svg.addEventListener("click", (e) => {
-			const k = keyAt(e);
-			if (!k) return;
-			const [h, o] = k.split("-").map(Number);
-			if (h !== 0 || o >= state.n) return;
-			state.leaf = state.leaf === o ? null : o;
-			render();
-		});
+		for (const p of panels) {
+			p.svg.addEventListener("pointerover", (e) => { const k = keyAt(e); for (const q of panels) q.hover(k); });
+			p.svg.addEventListener("pointerleave", () => { for (const q of panels) q.hover(null); });
+			p.svg.addEventListener("click", (e) => {
+				const k = keyAt(e);
+				if (!k) return;
+				const [h, o] = k.split("-").map(Number);
+				if (h !== 0 || o >= state.n) return;
+				state.leaf = state.leaf === o ? null : o;
+				render();
+			});
+		}
 
 		render();
 
@@ -383,7 +396,7 @@
 					if (state.n === 0) play();
 				}
 			}, { threshold: 0.3 });
-			io.observe(svg);
+			io.observe(panels[0].svg);
 		}
 	}
 

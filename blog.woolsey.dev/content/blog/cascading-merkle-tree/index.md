@@ -74,10 +74,10 @@ leaves:  0  1  2  3   4  5  6  7
 
 ## See it move
 
-Press play, or push leaves one at a time. Every node and its array slot share a color, and hovering over a node highlights its slot. Then flip to **Classic heap** and push past a power of two. Every index migrates to a new node, and the whole array shuffles. Click a leaf number to trace its path to the root. The dashed rings mark the siblings that make up its Merkle proof. Above the stored part, the siblings are all Z values from the sparse column, so they cost nothing to read.
+Press play, or push leaves one at a time. The same tree is stored two ways, growing in lockstep: the cascading layout on top and a classic heap below. Every node and its array slot share a color, and hovering over a node highlights it in both layouts. Watch what happens each time the tree passes a power of two. The cascading array just gets longer. In the heap, every index moves to a new node and the whole array shuffles. Click a leaf number to trace its path to the root. The dashed rings mark the siblings that make up its Merkle proof. Above the stored part, the siblings are all Z values from the sparse column, so they cost nothing to read.
 
 <figure class="cmt-fig" data-fig="grow">
-<figcaption>Figure 2. A depth-5 cascading tree (pretend it says 30). Solid nodes are stored in the array, and dashed nodes and triangles are computed from the sparse column. In the cascading layout the array grows by appending, and each chunk is one spine node plus one complete subtree. In the classic heap layout, every time the tree grows a level, every entry moves.</figcaption>
+<figcaption>Figure 2. The same depth-5 tree (pretend it says 30), stored two ways. Top: the cascading layout, where the array grows by appending and each chunk is one spine node plus one complete subtree. Bottom: a classic heap, where every entry moves each time the tree grows a level. In both, solid nodes are stored in the array, and dashed nodes and triangles are computed from the sparse column.</figcaption>
 </figure>
 
 ## The arithmetic
