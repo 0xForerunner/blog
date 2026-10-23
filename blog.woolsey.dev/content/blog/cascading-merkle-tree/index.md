@@ -137,7 +137,8 @@ Filling in the leaves works the same way, with a parallel `zip` of the new leave
 ## Why it's worth the weirdness
 
 - **Growth is append-only.** When the array fills, `push` extends it to the next power of two with empty values. On an `MmapVec` that means growing the file. Nothing gets rewritten.
-- **Rows are contiguous.** Each chunk is a self-contained heap, so bulk construction is one safe, lock-free parallel pass per row.
+- **Parallel by construction.** Each chunk is a self-contained heap, so bulk construction is one parallel pass per row. `split_at_mut` and `par_iter_mut` make that pass safe without locks, atomics or `unsafe`.
+- **SIMD-friendly.** Every row is a contiguous slice, and its parents sit in another contiguous slice right in front of it. Each pass reads adjacent pairs and writes sequentially, which is exactly the access pattern that vectorized and batched hash implementations want. A strided layout would make you gather and scatter.
 - **It's still just an array.** You get cache-friendly access and trivially serialized state. A restart is an `mmap` plus an optional `validate()`.
 - **You pay for what you use**, rounded up to a power of two. You never pay for 64 GiB of nothing.
 
