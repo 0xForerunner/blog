@@ -23,7 +23,7 @@ That's fine for a tree whose size never changes. It's a real problem for a fixed
 
 Sometimes a Merkle tree's depth isn't yours to choose. Whatever consumes the proofs expects a set number of siblings, say 30, and that number holds from the first leaf to the billionth. There's no "small tree for now, bigger tree later".
 
-A depth-30 tree has 2³⁰ leaves and 2³¹ − 1 nodes. With 32-byte hashes, a fully materialized tree comes to about **64 GiB**. Almost all of it is the hash of nothing, hashed with more nothing, all the way up.
+A depth-30 tree has 2³⁰ leaves and 2³¹ − 1 nodes. With 256-bit (32-byte) hashes, a fully materialized tree comes to about **64 GiB**. Almost all of it is the hash of nothing, hashed with more nothing, all the way up.
 
 So we want:
 
@@ -53,7 +53,7 @@ First, some vocabulary. A node's *height* is how many levels it sits above the l
 
 So we only store the bottom-left subtree. The real question is how to *grow* it.
 
-**Observation two: grow the tree sideways, not downward.** When the stored subtree of height *d* fills up, make it the left child of a new node at height *d* + 1. That new node's right child is a brand-new, empty subtree of height *d*. The leftmost path, from leaf 0 straight up, becomes a *spine*, and each spine node has a perfectly ordinary complete subtree hanging off its right side.
+**Observation two: grow the tree sideways, not downward.** When the stored subtree of height *h* fills up, make it the left child of a new node at height *h* + 1. That new node's right child is a brand-new, empty subtree of height *h*. The leftmost path, from leaf 0 straight up, becomes a *spine*, and each spine node has a perfectly ordinary complete subtree hanging off its right side.
 
 Each of those right subtrees is a complete binary tree, so it gets the textbook heap layout. That raises the question of where the spine node goes.
 
@@ -66,15 +66,13 @@ That leaves the very first slot of the whole array, index 0, which nobody wanted
 ```
           8               spine: 1, 2, 4, 8, ...
     4            9
- 2     5     10     11    chunk 3 = [8, 16)
-1  3  6  7  12 13 14 15     = spine 8 + heap 9..15
-
-leaves:  0  1  2  3   4  5  6  7
+ 2     5     10     11
+1  3  6  7  12 13 14 15
 ```
 
 ## See it move
 
-Press play, or push leaves one at a time. The same tree is stored two ways, growing in lockstep: the cascading layout on top and a classic heap below. Every node and its array slot share a color, and hovering over a node highlights it in both layouts. Watch what happens each time the tree passes a power of two. The cascading array just gets longer. In the heap, every index moves to a new node and the whole array shuffles. Click a leaf number to trace its path to the root. The dashed rings mark the siblings that make up its Merkle proof. Above the stored part, the siblings are all Z values from the sparse column, so they cost nothing to read.
+The figure plays on its own and loops. Pause it, or push leaves one at a time. The same tree is stored two ways, growing in lockstep: the cascading layout on top and a classic heap below. Every node and its array slot share a color, and hovering over a node highlights it in both layouts. Watch what happens each time the tree passes a power of two. The cascading array just gets longer. In the heap, every index moves to a new node and the whole array shuffles. Click a leaf number to trace its path to the root. The dashed rings mark the siblings that make up its Merkle proof. Above the stored part, the siblings are all Z values from the sparse column, so they cost nothing to read.
 
 <figure class="cmt-fig" data-fig="grow">
 <figcaption>Figure 2. The same depth-5 tree (pretend it says 30), stored two ways. Top: the cascading layout, where the array grows by appending and each chunk is one spine node plus one complete subtree. Bottom: a classic heap, where every entry moves each time the tree grows a level. In both, solid nodes are stored in the array, and dashed nodes and triangles are computed from the sparse column.</figcaption>
@@ -105,13 +103,13 @@ pub fn parent(i: usize) -> usize {
 
 A spine node's parent is the next spine node. Every other node does a normal heap step within its own chunk: subtract the chunk base, shift, then add the base back. `sibling` follows the same pattern, with two edge cases. A spine node's sibling is the root of the right subtree next to it (2*i* + 1). That right subtree's root, in turn, has a spine node as its sibling (*prev_pow* / 2).
 
-A proof walks up `storage_depth` levels using those functions. It then tops off the remaining levels with entries from the sparse column, since everything to the right of the stored region is empty by definition.
+A proof walks up through the stored levels using those functions. It then tops off the remaining levels with entries from the sparse column, since everything to the right of the stored region is empty by definition.
 
 ## Parallelism, with the borrow checker's blessing
 
 Building a tree from a big batch of leaves is the expensive part, so it should use every core. The layout makes that easy, and Rust makes it safe.
 
-Inside a chunk, the subtree is an ordinary heap, so each row of the subtree is a contiguous slice. Better still, the row of parents sits directly in front of the row of children. For the subtree's local storage, the children at depth *k* occupy [2ᵏ, 2ᵏ⁺¹), and their parents occupy [2ᵏ⁻¹, 2ᵏ). A single `split_at_mut` hands us both rows as separate borrows:
+Inside a chunk, the subtree is an ordinary heap, so each row of the subtree is a contiguous slice. Better still, the row of parents sits directly in front of the row of children. For the subtree's local storage, the children at depth *j* occupy [2ʲ, 2ʲ⁺¹), and their parents occupy [2ʲ⁻¹, 2ʲ). A single `split_at_mut` hands us both rows as separate borrows:
 
 ```rust
 // Iterate over mutable layers of the tree
@@ -137,12 +135,12 @@ Filling in the leaves works the same way, with a parallel `zip` of the new leave
 ## Why it's worth the weirdness
 
 - **Growth is append-only.** When the array fills, `push` extends it to the next power of two with empty values. On an `MmapVec` that means growing the file. Nothing gets rewritten.
-- **Parallel by construction.** Each chunk is a self-contained heap, so bulk construction is one parallel pass per row. `split_at_mut` and `par_iter_mut` make that pass safe without locks, atomics or `unsafe`.
+- **Parallel by construction.** Bulk construction is one safe, lock-free parallel pass per row, as shown above.
 - **SIMD-friendly.** Every row is a contiguous slice, and its parents sit in another contiguous slice right in front of it. Each pass reads adjacent pairs and writes sequentially, which is exactly the access pattern that vectorized and batched hash implementations want.
-- **It's still just an array.** You get cache-friendly access and trivially serialized state. A restart is an `mmap` plus an optional `validate()`.
+- **It's still just an array.** State is trivially serialized. A restart is an `mmap` plus an optional `validate()`.
 - **You pay for what you use**, rounded up to a power of two. You never pay for 64 GiB of nothing.
 
-## Bonus chatter
+## Odds and ends
 
 Slot 0 never holds an actual hash, but the backing array is typed as hashes. So the leaf count is written into the bytes of the first entry with `bytemuck`. If your hash type is smaller than a `usize`, the count doesn't fit, and that panics. The PR has a test named `test_hash_too_small` whose entire job is to make sure it does.
 
