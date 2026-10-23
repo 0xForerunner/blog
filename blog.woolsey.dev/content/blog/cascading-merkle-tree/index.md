@@ -143,7 +143,7 @@ Filling in the leaves works the same way, with a parallel `zip` of the new leave
 
 ## Bonus chatter
 
-Storing the leaf count in slot 0 means slot 0 has to hold a `usize`, and it shares the array with hashes. So the tree reinterprets the first hash as a `usize` with `bytemuck`. If your hash type is smaller than a `usize`, that panics. The PR has a test named `test_hash_too_small` whose entire job is to make sure it does.
+Slot 0 never holds an actual hash, but the backing array is typed as hashes. So the leaf count is written into the bytes of the first entry with `bytemuck`. If your hash type is smaller than a `usize`, the count doesn't fit, and that panics. The PR has a test named `test_hash_too_small` whose entire job is to make sure it does.
 
 Also, `get_leaf_from_hash` scans leaves from right to left, one chunk at a time. If you're looking up a hash, it's probably one somebody added recently.
 
