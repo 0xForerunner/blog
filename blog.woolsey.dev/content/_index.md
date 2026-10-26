@@ -24,13 +24,13 @@
 
 I am a Senior Software Engineer, Rust enthusiast, and open source advocate with an extremely diverse background. I love building things from scratch and diving into new technologies head-first. From crafting low-level systems in Rust to writing smart contracts that secure digital economies, I enjoy tackling complex problems and learning as I go.
 
-In my free time, you’re more likely to find me outdoors than indoors. I live near the mountains in beautiful British Columbia, and I take full advantage of it – whether it’s snowboarding down a steep slope, kiteboarding across the Howe Sound, mountain biking on forest trails, or literally running off a cliff with a paraglider. These adrenaline-fueled hobbies help balance out the generally more relaxed life of a coder.
+In my free time, you’re more likely to find me outdoors than indoors. I live near the mountains in British Columbia, and I take full advantage of it. Whether it’s snowboarding down a steep slope, kiteboarding across the Howe Sound, mountain biking on squamish trails, or running off a cliff with a paraglider. These adrenaline-fueled hobbies help balance out the generally more subdued life behind a computer.
 
 ---
 
 # Culture
 
-I believe the best way to learn is by doing, and the best way to teach is by example. Over the years, I’ve gone from academia to startups to big tech, and one constant is that hands-on experience beats theory (though my inner scientist still loves a good theory). I value open communication and collaboration – whether it’s pair programming or discussing ideas on a pull request, I’m always up for knowledge sharing.
+I believe the best way to learn is by doing, and the best way to teach is by example. Over the years, I’ve gone from academia to startups to big tech, and one constant is that hands-on experience beats theory. I value open communication and collaboration – whether it’s pair programming or discussing ideas on a PR, I’m always up for knowledge sharing.
 
 I’m a strong proponent of open source. Almost all the tools and frameworks I use (and build) are open source, and I love that community-driven vibe. In my view, transparency and collaboration aren’t just buzzwords; they’re how the best software gets made.
 
