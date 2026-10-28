@@ -53,17 +53,17 @@ I also like mentoring. I've onboarded people in research labs and on engineering
 
 > 2024 – Present
 
-- **World Chain:** Built core services and extensions for the OP Stack, including Rollup Boost, P2P Flashblocks propagation, and [World Chain](https://world.org/world-chain) itself. Most of this lives in or alongside the [reth](https://reth.rs/overview/) codebase, including a custom block builder.
-- **Smart contracts:** Wrote and maintained audited Solidity contracts deployed on Ethereum mainnet, Base, Optimism, and World Chain, along with the tooling to deploy, configure, and upgrade multi-contract protocols without doing it by hand.
-- **Zero-knowledge proofs:** Designed and implemented ZK circuits that let users prove things about their data without revealing it, and integrated them into the World ID Protocol. A lot of the job is translating the cryptography into something that actually runs efficiently on-chain.
+- **World Chain:** Built core services and extensions for the OP Stack, including Rollup Boost, P2P Flashblocks propagation, and [World Chain](https://world.org/world-chain) itself. Most of this lives in or alongside the [reth](https://reth.rs/overview/) codebase: the World Chain execution client, a custom block builder, and the proof system the protocol depends on.
+- **Smart contracts:** Wrote and maintained audited Solidity contracts deployed on Ethereum mainnet, Base, Optimism, and World Chain. I also built the deployment tooling that builds, optimizes, configures, deploys, migrates, and interacts with multi-contract protocols, so nobody has to do it by hand.
+- **Zero-knowledge proofs:** Designed and implemented new ZK circuits, now used in production by millions of people, that let users prove things about their data without revealing it, and integrated them into the World ID Protocol. I've worked with Noir, Circom, Gnark, Plonky3, SP1, and RISC Zero. A lot of the job is translating the cryptography into something that actually runs efficiently on-chain.
 - **Infrastructure:** Run Kubernetes clusters and AWS infrastructure for the services above.
-- **Mentoring:** Run training sessions and code walkthroughs, and push for thorough reviews and a blameless culture.
+- **Mentoring:** Onboard new hires, which usually means teaching them Rust and a very unfamiliar development environment at the same time. I also run training sessions and code walkthroughs, and push for thorough reviews and a blameless culture.
 
 ### Senior Software Engineer at Cryptech Developments – _Lead engineer on Neptune Protocol_
 
 > 2021 – 2023
 
-- **Neptune:** Designed and built Neptune, a multi-contract lending protocol written in Rust with CosmWasm. As lead developer I owned everything from core logic to gas optimization to getting the code through security audits.
+- **Neptune:** Designed and built Neptune, a multi-contract lending protocol written in Rust with CosmWasm. I wrote the smart contracts, backend API, and liquidation bot myself, and owned everything from core logic to gas optimization to getting the code through security audits.
 - **Backend:** Built the API and a custom indexer that fed real-time protocol data to the front end.
 - **Liquidation bot:** Wrote an autonomous bot that watched the market and liquidated under-collateralized loans.
 - **Simulation & testing:** Built Monte Carlo models of market behaviour to tune parameters like collateralization ratios and stress-test extreme scenarios. Set up the test suites and CI that every change had to pass.
@@ -72,9 +72,13 @@ I also like mentoring. I've onboarded people in research labs and on engineering
 
 > 2011 – 2021
 
-From undergrad through my Ph.D. I worked on neutrino and dark matter experiments. I designed and prototyped particle detectors (including a cryogenic liquid argon detector read out by silicon photomultipliers), built custom electronics like an LED pulser with picosecond timing, and wrote a lot of GEANT4 simulations.
+From undergrad through my Ph.D. I worked on neutrino and dark matter experiments, mostly designing detectors and writing the simulations that predict their behaviour.
 
-It's closer to software than it sounds. It taught me to program, analyze data, and debug systems where every part can fail. And once you've debugged a sensor array at −110 °C in an underground lab at 3 am, a misbehaving cloud service from a comfy chair doesn't seem so bad.
+- **Ph.D., UBC (2016 – 2021):** Designed and prototyped a Cherenkov light detector built from silicon photomultipliers surrounding a cryogenic liquid xenon core. The design depended on modelling the excitation and decay of individual xenon atoms and tracking every photon through the detector, so I built the full GEANT4 Monte Carlo simulation from scratch and used it to optimize the detector geometry. I also wrote custom machine learning algorithms to pick signal out of noise in the large volumes of simulated data and to measure how well the detector would actually perform.
+- **Photodetector design, University of Alberta (2015 – 2017):** Designed and simulated a new kind of photodetector. It looks like a photomultiplier tube, but replaces the dynode chain with a silicon photodiode array that detects the electrons ejected from the photocathode directly. I used COMSOL to design the electric field that focuses those electrons and GEANT4 to model the whole device.
+- **PINGU / IceCube, University of Alberta (2015 – 2016):** Designed, built, and tested a prototype circuit board that digitally controlled a picosecond LED pulser, used to calibrate the proposed PINGU low-energy neutrino detector.
+- **DEAP-3600, University of Alberta (2011 – 2015):** My first research job, on a dark matter detector at SNOLAB. I rewrote a data analysis program for processing and visualizing raw detector data, tested and tuned the signal conditioning electronics on the U of A testbed, simulated the detector in RAT to study its background discrimination, and designed and built a scintillating fibre-optic veto to reject background events in the main vessel. I also helped build the polyethylene dams used in the detector's construction.
+
 
 ---
 
@@ -91,3 +95,5 @@ You can see what I'm working on at [GitHub](https://github.com/0xForerunner). Fe
 **Ph.D. in Physics** – University of British Columbia (2016 – 2021)
 
 **B.Sc. in Physics** – University of Alberta (2011 – 2015)
+
+Funded along the way by an IsoSiM scholarship at UBC, the Queen Elizabeth II Graduate Scholarship, and an NSERC Undergraduate Student Research Award.
