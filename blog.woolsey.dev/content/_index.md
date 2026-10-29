@@ -61,7 +61,7 @@ I also like mentoring. I've onboarded people in research labs and on engineering
 - **Infrastructure:** Run Kubernetes clusters and AWS infrastructure for the services above.
 - **Mentoring:** Onboard new hires, which usually means teaching them Rust and a very unfamiliar development environment at the same time. I also run training sessions and code walkthroughs, and push for thorough reviews and a blameless culture.
 
-### Senior Software Engineer at Cryptech Developments – _Sole engineer on Neptune Protocol_
+### Principal Engineer at Cryptech Developments – _Sole engineer on Neptune Protocol_
 
 > 2021 – 2023
 
