@@ -23,6 +23,8 @@
 
 I'm a software engineer who mostly writes Rust. These days that means protocol heavy work or blockchain infrastructure, usually somewhere deep inside [reth](https://reth.rs/overview/), [world-chain](https://github.com/worldcoin/world-chain), or [world-id-protocol](https://github.com/worldcoin/world-id-protocol). Before that I built a DeFi lending protocol from scratch, and before *that* I spent ten years as a physicist building particle detectors. The common thread is that I like building things from the ground up and learning whatever I need to along the way.
 
+If you just want the highlights, here's my [résumé (PDF)](/resume.pdf).
+
 I live near the mountains in British Columbia, so when I'm not at a computer I'm usually outside: snowboarding, kiteboarding on Howe Sound, mountain biking around Squamish, or running off a cliff with a paraglider. It balances out all the sitting.
 
 ---

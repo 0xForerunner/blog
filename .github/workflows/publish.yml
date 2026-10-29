@@ -14,6 +14,13 @@ jobs:
         steps:
             - name: checkout
               uses: actions/checkout@v4
+            - name: build_resume
+              uses: xu-cheng/latex-action@v3
+              with:
+                  root_file: resume.tex
+                  working_directory: resume
+            - name: copy_resume
+              run: cp resume/resume.pdf blog.woolsey.dev/static/resume.pdf
             - name: build_and_deploy
               uses: shalzz/zola-deploy-action@v0.19.1
               env:

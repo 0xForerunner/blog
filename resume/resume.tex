@@ -1,0 +1,172 @@
+\documentclass[11pt,letterpaper]{article}
+
+% ---------- Packages ----------
+\usepackage[T1]{fontenc}
+\usepackage[semibold]{ebgaramond}
+\usepackage[letterpaper,margin=0.6in,top=0.5in,bottom=0.5in]{geometry}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{fontawesome5}
+\usepackage[tracking=true]{microtype}
+\usepackage{tabularx}
+\usepackage[hidelinks]{hyperref}
+
+% ---------- Colours ----------
+\definecolor{accent}{HTML}{1F4E79}
+\definecolor{muted}{HTML}{5A5A5A}
+
+% ---------- Layout ----------
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\linespread{1.05}
+
+\newcommand{\sectitle}[1]{\textls[120]{\MakeUppercase{#1}}}
+\titleformat{\section}
+  {\color{accent}\large\bfseries}
+  {}{0pt}
+  {\sectitle}
+  [{\color{accent}\titlerule[0.8pt]}]
+\titlespacing*{\section}{0pt}{10pt}{5pt}
+
+\setlist[itemize]{leftmargin=1.1em,label={\color{accent}\small\textbullet},
+  itemsep=1.5pt,topsep=2pt,parsep=0pt}
+
+% ---------- Commands ----------
+% \entry{Title}{Dates}{Organisation}{Location}
+\newcommand{\entry}[4]{%
+  \textbf{#1}\hfill{\color{muted}#2}\\
+  {\color{muted}\itshape #3}\hfill{\color{muted}\small #4}\par\vspace{1pt}}
+
+% \subentry{Title}{Dates}{Organisation}
+\newcommand{\subentry}[3]{%
+  \vspace{4pt}\textbf{#1}{\color{muted}\enspace\textperiodcentered\enspace\itshape #3}\hfill{\color{muted}#2}\par}
+
+% \link{url}{text}: accent-coloured hyperlink
+\newcommand{\link}[2]{\href{#1}{\color{accent}#2}}
+
+\newcommand{\skill}[2]{\textbf{#1} & #2 \\[2pt]}
+
+\newcommand{\award}[3]{\textbf{#1}{\color{muted}\,\textendash\,#2}\hfill{\color{muted}#3}\par\vspace{2pt}}
+
+\begin{document}
+
+% ---------- Header ----------
+\begin{center}
+  {\fontsize{26}{30}\selectfont\bfseries\color{accent} Eric Woolsey}\\[3pt]
+  {\large\color{muted} Protocol Engineer \enspace\textbar\enspace Ph.D.\ Physics}\\[5pt]
+  \small
+  \faMapMarker*\ Bowen Island, BC, Canada \quad
+  \faPhone*\ (778) 798-3909 \quad
+  \faEnvelope\ \href{mailto:ewoolsey@ualberta.ca}{ewoolsey@ualberta.ca} \quad
+  \faGithub\ \href{https://github.com/0xForerunner}{github.com/0xForerunner}
+\end{center}
+
+\vspace{-2pt}
+Protocol engineer and experimental physicist who builds novel, deeply technical systems end-to-end,
+backed by a research career involving Monte Carlo simulation, detector design, machine-learning, data analysis and academic writing.
+
+% ---------- Experience ----------
+\section{Experience}
+
+\entry{Senior Software Engineer II}{2024 -- Present}{World (Tools for Humanity)}{}
+\begin{itemize}
+  \item Designed and shipped novel \textbf{zero-knowledge circuits} running in production for millions of users,
+        working across Noir, Circom, Gnark, Plonky3, SP1, and RISC Zero.
+  \item Built core \textbf{World protocol infrastructure}, including the \link{https://github.com/worldcoin/world-chain}{World Chain execution client},
+        \link{https://github.com/worldcoin/world-chain/tree/main/proofs}{proof system},
+        \link{https://blog.woolsey.dev/blog/p2p-flashblocks/}{Flashblocks}, and
+        \link{https://github.com/flashbots/rollup-boost}{rollup-boost}.
+  \item Developed audited \textbf{Solidity} contracts deployed to Ethereum, Base, Optimism, and World Chain.
+  \item Created deployment tooling that builds, optimizes, configures, deploys, migrates, and interacts with
+        multi-contract protocols.
+  \item Deployed scalable Kubernetes services to the cloud using Helm and ArgoCD.
+  \item Mentored new hires, ramping them up on an unfamiliar language and development environment.
+\end{itemize}
+
+\vspace{6pt}
+\entry{Senior Software Engineer}{2021 -- 2023}{Cryptech Developments}{}
+\begin{itemize}
+  \item \textbf{Sole engineer} behind the \link{https://app.nept.finance}{Neptune Protocol}: designed and built its smart contracts,
+        backend API, and liquidation service.
+  \item Architected audited, multi-contract \textbf{Rust} protocols from the ground up, prioritizing safety,
+        scalability, and efficiency.
+  \item Built backend APIs, chain indexers, and autonomous bots that monitor and transact on-chain.
+  \item Wrote \textbf{Monte Carlo market simulations} to model market behaviour and tune protocol parameters.
+  \item Designed rigorous testing and CI strategies for mission-critical financial systems.
+  \item Owned developer tooling, cloud deployment, and onboarding of new engineers.
+\end{itemize}
+
+% ---------- Skills ----------
+\section{Technical Skills}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.9cm}>{\raggedright\arraybackslash}X@{}}
+  \skill{Languages}{Rust, Solidity, C, C++, Go, TypeScript, Python, SQL}
+  \skill{Zero Knowledge}{Noir, Circom, Gnark, Plonky3, SP1, RISC Zero; ZK rollups, Ethereum coprocessors,
+    privacy-preserving on-chain proofs}
+  \skill{Blockchain}{EVM smart contracts, Rust smart contracts, protocol design, execution clients, chain indexers}
+  \skill{Infrastructure}{Docker, Kubernetes, Helm, ArgoCD, AWS, CI/CD}
+  \skill{Scientific Computing}{Monte Carlo methods, GEANT4, ROOT, COMSOL, ANSYS Maxwell3D, PyTorch, TensorFlow,
+    parallel computing}
+  \skill{Hardware}{Analog \& digital electronics, PCB prototyping, FPGAs, lab instrumentation}
+\end{tabularx}
+
+% ---------- Education ----------
+\section{Education}
+\entry{Ph.D., Physics}{2021}{University of British Columbia}{Vancouver, BC}
+\vspace{3pt}
+\entry{B.Sc., Physics}{2015}{University of Alberta}{Edmonton, AB}
+
+% ---------- Research ----------
+\newpage
+\section{Research Experience}
+
+\subentry{Doctoral Research: nEXO Collaboration}{2016 -- 2021}{University of British Columbia}
+\begin{itemize}
+  \item Designed and prototyped a Cherenkov light detector for nEXO, a neutrinoless double-beta decay search,
+        built from silicon photomultipliers surrounding a cryogenic liquid-xenon core.
+  \item Built a full \textbf{GEANT4 Monte Carlo} model from scratch, simulating xenon excitation and decay and
+        tracking individual quanta through the detector; used it to optimize detector performance.
+  \item Developed bespoke \textbf{machine-learning} algorithms to separate signal from noise in high-volume
+        simulated data and quantify detector efficacy.
+\end{itemize}
+
+\subentry{Novel Photodetector Design}{2015 -- 2017}{University of Alberta}
+\begin{itemize}
+  \item Designed and simulated a PMT-style photodetector using a silicon photodiode array to directly detect
+        photoelectrons; modelled electron-focusing fields in COMSOL and system response in GEANT4.
+\end{itemize}
+
+\subentry{PINGU Neutrino Observatory (IceCube Collaboration)}{2015 -- 2016}{University of Alberta}
+\begin{itemize}
+  \item Designed, built, and tested a prototype circuit board digitally controlling a picosecond LED pulser
+        for precision detector calibration.
+\end{itemize}
+
+\subentry{DEAP-3600 Dark Matter Experiment}{2011 -- 2015}{University of Alberta}
+\begin{itemize}
+  \item Simulated, designed, built, and installed a scintillating-fibre veto photodetector to reject
+        background events in the main vessel.
+  \item Modelled the full detector with the Reactor Analysis Tool (RAT) to characterize background discrimination.
+  \item Rewrote the data-analysis software used to process and visualize raw detector data.
+  \item Tested and optimized signal-conditioning electronics on the UofA testbed; assembled detector components.
+\end{itemize}
+
+% ---------- Awards ----------
+\section{Awards \& Scholarships}
+\award{ISOSiM Scholarship}{\$32,400, research in nuclear isotopes and radiation}{2016 -- 2020}
+\award{Queen Elizabeth II Graduate Scholarship}{\$10,800, top of class, University of Alberta}{2015}
+\award{NSERC Undergraduate Student Research Award}{\$4,500}{2013}
+\award{Louise McKinney Scholarship}{\$2,500, top 1.5--2\% of class}{2011 -- 2012}
+\award{Faculty of Science Academic Excellence Scholarship}{\$1,000}{2011}
+\award{Dean's Honour Roll, University of Alberta}{three consecutive years}{2011 -- 2014}
+
+% ---------- Volunteer ----------
+\section{Volunteering}
+Biathlon Bears youth coach (350\,h) \textperiodcentered{}
+Science Fundamentals demonstrator for elementary schools (90\,h) \textperiodcentered{}
+Alberta Health Services (50\,h) \textperiodcentered{}
+Habitat for Humanity build site (26\,h) \textperiodcentered{}
+Halloween for Hunger food drive (5\,h)
+
+\end{document}

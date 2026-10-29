@@ -1,0 +1,16 @@
+default: build
+
+# Build resume.pdf, copy it into the blog's static dir, and remove intermediate files
+build:
+    latexmk -pdf -interaction=nonstopmode -halt-on-error resume.tex
+    latexmk -c resume.tex
+    cp resume.pdf ../blog.woolsey.dev/static/resume.pdf
+
+# Rebuild automatically on every save
+watch:
+    latexmk -pdf -pvc -interaction=nonstopmode resume.tex
+
+# Remove all build output, including the PDF
+clean:
+    latexmk -C resume.tex
+    rm -f ../blog.woolsey.dev/static/resume.pdf
