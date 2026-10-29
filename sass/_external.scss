@@ -4,6 +4,7 @@ a.external::after {
 	opacity: var(--dim-opacity);
 	mask-image: var(--icon-external);
 	mask-size: cover;
+	-webkit-mask-size: cover;
 	margin-inline-start: 0.25rem;
 	background-color: currentColor;
 	width: max(0.75rem, 0.75em);

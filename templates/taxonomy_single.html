@@ -1,25 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
-{%- set date_format = macros_translate::translate(key="date_format", default="%B %d, %Y", language_strings=language_strings) -%}
-{%- set date_locale = macros_translate::translate(key="date_locale", default="en_US", language_strings=language_strings) -%}
-{%- set number_of_posts = term.pages | length -%}
+	{%- set date_format = <translate key="date_format" default="%B %d, %Y" language_strings /> -%}
+	{%- set number_of_posts = term.pages | length -%}
 
-{%- set term_name = "“" ~ term.name ~ "”" -%}
-<h1>
-	{{- macros_translate::translate(key="posts_with_tag", default="Posts with tag $TAG", language_strings=language_strings) | replace(from="$TAG", to=term_name) -}}
-	<a href="{{ current_url ~ 'atom.xml' }}"><i class="icon feed"></i></a>
-</h1>
-
-<p>
-	<small>
-		<a href="{{ get_url(path='tags', lang=lang) }}">
-			{{ macros_translate::translate(key="all_tags", default="See all tags", language_strings=language_strings) }}
+	{%- set taxon_name = taxonomy.name -%}
+	{%- set taxon_name_i18n = <translate key={taxonomy.name} default={taxonomy.name} language_strings /> -%}
+	{%- set term_name = "“" ~ term.name ~ "”" -%}
+	<h1>
+		{{- <translate key="posts_with_taxon" default="Posts with $TAXON $TERM" language_strings /> | replace(from="$TAXON", to=taxon_name_i18n) | replace(from="$TERM", to=term_name) -}}
+		{% if taxonomy.feed %}
+		<a href="{{ current_url ~ 'atom.xml' }}">
+			<i class="icon feed"></i>
 		</a>
-		<br />
-		{{ macros_translate::translate(key="posts", number=number_of_posts, default="$NUMBER posts", language_strings=language_strings) }}
-	</small>
-</p>
+		{% endif %}
+	</h1>
 
-{% include "partials/articles.html" %}
+	<p>
+		<small>
+			<a href="{{- get_url(path=taxonomy.name, lang=lang) | lower -}}">
+				{{- <translate key="all_taxa" default="See all $TAXON" language_strings /> | replace(from="$TAXON", to=taxon_name_i18n) -}}
+			</a>
+			<br/>
+			{{ <translate key="posts" number={number_of_posts} default="$NUMBER posts" language_strings /> }}
+		</small>
+	</p>
+
+	{% block details %}{% endblock details %}
+	{% include "partials/articles.html" %}
 {% endblock content %}
