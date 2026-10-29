@@ -61,11 +61,12 @@ I also like mentoring. I've onboarded people in research labs and on engineering
 - **Infrastructure:** Run Kubernetes clusters and AWS infrastructure for the services above.
 - **Mentoring:** Onboard new hires, which usually means teaching them Rust and a very unfamiliar development environment at the same time. I also run training sessions and code walkthroughs, and push for thorough reviews and a blameless culture.
 
-### Principal Engineer at Cryptech Developments – _Sole engineer on Neptune Protocol_
+### Principal Engineer at Cryptech Developments
 
 > 2021 – 2023
 
-- **Neptune:** Designed and built [Neptune](https://app.nept.finance), a multi-contract lending protocol written in Rust with CosmWasm. I wrote the smart contracts, backend API, and liquidation bot myself, and owned everything from core logic to gas optimization to getting the code through security audits.
+- **Neptune:** Designed and built [Neptune](https://app.nept.finance), a multi-contract lending protocol written in Rust with CosmWasm. As the sole protocol engineer, I wrote the smart contracts and liquidation bot, and owned everything from core logic to gas optimization to getting the code through security audits.
+- **Whitepaper:** Sole author of the [Neptune Money Market Whitepaper](/neptune-whitepaper.pdf), which describes the protocol's design, including its built-in leveraged investing and a PID-controlled interest rate curve.
 - **Backend:** Built the API and a custom indexer that fed real-time protocol data to the front end.
 - **Liquidation bot:** Wrote an autonomous bot that watched the market and liquidated under-collateralized loans.
 - **Simulation & testing:** Built Monte Carlo models of market behaviour to tune parameters like collateralization ratios and stress-test extreme scenarios. Set up the test suites and CI that every change had to pass.
