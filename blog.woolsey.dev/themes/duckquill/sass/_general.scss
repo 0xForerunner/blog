@@ -6,11 +6,9 @@
 	scroll-behavior: smooth;
 	scrollbar-color: var(--accent-color) transparent;
 	accent-color: var(--accent-color);
-	font-size: 16px;
 }
 
 body {
-	text-wrap: pretty;
 	display: grid; // Put footer at the bottom for short pages, such as the 404
 	grid-template-rows: auto minmax(auto, 1fr) auto; // Header, stuff, footer
 	grid-template-areas:
@@ -23,6 +21,7 @@ body {
 	color: var(--fg-color);
 	line-height: 1.5;
 	font-family: var(--font-system-ui), var(--font-emoji);
+	text-wrap: pretty;
 	overflow-wrap: break-word;
 
 	&:has(#sidebar) {
@@ -83,7 +82,8 @@ body {
 
 main {
 	margin: 4.25rem auto 4rem;
-	width: min(var(--container-width), 90%);
+	width: calc(100% - 2rem);
+	max-width: var(--container-width);
 }
 
 #sidebar {
