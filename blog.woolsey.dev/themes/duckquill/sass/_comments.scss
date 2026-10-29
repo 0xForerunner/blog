@@ -168,6 +168,7 @@
 							vertical-align: -0.1875rem;
 							mask-image: var(--icon-verified);
 							mask-size: cover;
+							-webkit-mask-size: cover;
 							transition: var(--transition);
 							margin-inline-end: 0.25rem;
 							background-color: var(--accent-color);

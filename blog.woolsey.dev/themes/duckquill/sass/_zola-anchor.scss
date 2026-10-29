@@ -47,6 +47,7 @@ h6 {
 		-webkit-mask-image: var(--icon-link);
 		mask-image: var(--icon-link);
 		mask-size: cover;
+		-webkit-mask-size: cover;
 		transition: var(--transition);
 		width: 1em;
 		height: 1em;

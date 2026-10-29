@@ -22,7 +22,7 @@ jobs:
             - name: copy_resume
               run: cp resume/resume.pdf blog.woolsey.dev/static/resume.pdf
             - name: build_and_deploy
-              uses: shalzz/zola-deploy-action@v0.19.1
+              uses: shalzz/zola-deploy-action@v0.23.6
               env:
                   REPOSITORY: 0xForerunner/0xForerunner.github.io
                   PAGES_BRANCH: master

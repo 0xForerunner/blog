@@ -49,7 +49,7 @@ Now that we’re clear on what Flashblocks achieve, let’s talk about the core 
 The Flashblocks P2P network is essentially a set of peers (block builders and Flashblock consumers) engaged in rapid-fire distribution of partial blocks. Unlike a typical P2P network that floods transactions from *any* node, this is a more tightly controlled protocol where only authorized block-building nodes can generate new messages. The goals of the Flashblocks P2P layer are straightforward yet ambitious: propagate partial blocks in near real time, coordinate which node is currently building, and do it all without conflicts between participants.
 
 <!-- ![architecture](architecture.png) -->
-{{ image(url="architecture.png", alt="Flashblocks P2P Network Architecture", width=15, height=15, op="fit") }}
+{{ <image url="architecture.png" alt="Flashblocks P2P Network Architecture" /> }}
 
 ### **Signed, Sealed, Delivered: Authorized Messages**
 
