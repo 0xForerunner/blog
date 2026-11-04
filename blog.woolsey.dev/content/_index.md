@@ -51,7 +51,7 @@ I also like mentoring. I've onboarded people in research labs and on engineering
 
 # Experience
 
-### Senior Protocol Engineer II at Tools for Humanity – _World Chain_
+### World Chain Lead, Senior Protocol Engineer II at Tools for Humanity
 
 > 2024 – Present
 
